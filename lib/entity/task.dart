@@ -1,10 +1,14 @@
 ///
 /// 任务实体类
 ///
-class Task {
+abstract class Task {
   int id;
   String name;
-  bool status;
+  int importance;
+  int startTime;
+  int endTime;
+  int createdTime;
 
-  Task(this.id, this.name, this.status);
+  Task(this.id, this.name, this.importance, this.startTime, this.endTime,
+      this.createdTime);
 }

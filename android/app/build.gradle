@@ -43,7 +43,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.zzapp.gtd_task"
+        applicationId "com.zzapp.go_for_it"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()

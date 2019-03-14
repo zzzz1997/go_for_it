@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:gtd_task/entity/task.dart';
+import 'package:go_for_it/entity/time_task.dart';
 
 ///
 /// 主状态管理
@@ -26,10 +26,10 @@ class MainStateModel extends Model {
   DateTime get date => _date;
 
   // 任务列表
-  List<Task> _tasks;
+  List<TimeTask> _tasks;
 
   // 获取任务列表
-  List<Task> get tasks => _tasks;
+  List<TimeTask> get tasks => _tasks;
 
   MainStateModel(context) {
     _initApp(context);
@@ -40,7 +40,7 @@ class MainStateModel extends Model {
   ///
   _initApp(context) async {
     _themeData = Theme.of(context).copyWith(
-        primaryColor: Colors.blueAccent, accentColor: Colors.greenAccent);
+        primaryColor: Colors.blueAccent, accentColor: Colors.cyanAccent);
     _today =
       DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     _date =
@@ -60,12 +60,12 @@ class MainStateModel extends Model {
   ///
   /// 刷新任务列表
   ///
-  List<Task> getTask(DateTime dateTime) {
+  List<TimeTask> getTask(DateTime dateTime) {
     Random random = Random();
     int length = random.nextInt(15) + 5;
-    List<Task> tasks = List(length);
+    List<TimeTask> tasks = List(length);
     for (int i = 0; i < length; i++) {
-      tasks[i] = Task(i, '${dateTime.day}日的任务$i', random.nextBool());
+      tasks[i] = TimeTask(i, '${dateTime.day}日的任务$i', 0, 0, 0, random.nextInt(2), 0);
     }
     return tasks;
   }
@@ -73,8 +73,9 @@ class MainStateModel extends Model {
   ///
   /// 更改任务状态
   ///
-  changeTaskStatus(id, status) {
-    _tasks[_tasks.indexWhere((task) => task.id == id)].status = status;
+  changeTaskStatus(int id) {
+    TimeTask task = _tasks[_tasks.indexWhere((task) => task.id == id)];
+    task.status = (task.status + 1) > 2 ? 0 : task.status + 1;
     notifyListeners();
   }
 }

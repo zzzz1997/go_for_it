@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:circular_check_box/circular_check_box.dart';
-import 'package:gtd_task/entity/task.dart';
-import 'package:gtd_task/util/constant.dart';
+import 'package:go_for_it/entity/time_task.dart';
+import 'package:go_for_it/ui/view/half_check_box.dart';
+import 'package:go_for_it/util/constant.dart';
 
 // 页面数
 const _pageLength = 3;
@@ -40,7 +40,7 @@ class Calendar extends StatefulWidget {
   final DateTime date;
 
   // 任务列表
-  final List<Task> tasks;
+  final List<TimeTask> tasks;
 
   // 日期更改事件
   final Function onDateChange;
@@ -86,7 +86,7 @@ class CalendarState extends State<Calendar> {
   DateTime _date;
 
   // 任务列表
-  List<Task> _tasks;
+  List<TimeTask> _tasks;
 
   // 日期更改事件
   Function _onDateChange;
@@ -123,17 +123,25 @@ class CalendarState extends State<Calendar> {
     _onTaskStatusChange = widget.onTaskStatusChange;
 
     WidgetsBinding widgetsBinding = WidgetsBinding.instance;
-    widgetsBinding.addPostFrameCallback((callback) async {
-      _rowHeight =
-          _rowKey.currentContext.findRenderObject().semanticBounds.size.height;
-      double height =
-          _height - _rowHeight - _lineHeight - 2 * _listPadding - _tasks.length * _taskHeight;
-      setState(() {
-        _blankHeight = height > 0 ? height : 0.0;
-      });
-
+    widgetsBinding.addPostFrameCallback((_) async {
+      if (_rowKey.currentContext != null) {
+        _rowHeight =
+          _rowKey.currentContext
+            .findRenderObject()
+            .semanticBounds
+            .size
+            .height;
+        double height = _height -
+          _rowHeight -
+          _lineHeight -
+          2 * _listPadding -
+          _tasks.length * _taskHeight;
+        setState(() {
+          _blankHeight = height > 0 ? height : 0.0;
+        });
+      }
       await _scrollController.animateTo(_lineHeight * (_monthLines - 1),
-          duration: Duration(milliseconds: 100), curve: ElasticInCurve());
+        duration: Duration(milliseconds: 100), curve: ElasticInCurve());
       _scrollController.addListener(() {
         setState(() {});
       });
@@ -162,7 +170,7 @@ class CalendarState extends State<Calendar> {
                         style: TextStyle(
                             color:
                                 w == Constant.week[5] || w == Constant.week[6]
-                                    ? _themeData.accentColor
+                                    ? _themeData.primaryColor
                                     : _themeData.textTheme.body1.color),
                       ))
                   .toList(),
@@ -231,7 +239,7 @@ class CalendarState extends State<Calendar> {
                               height: _blankHeight,
                             );
                           }
-                          Task task = _tasks[index];
+                          TimeTask task = _tasks[index];
                           return SizedBox(
                             height: _taskHeight,
                             child: Card(
@@ -242,21 +250,21 @@ class CalendarState extends State<Calendar> {
                                   Text(
                                     task.name,
                                     style: TextStyle(
-                                        decoration: task.status
+                                        decoration: task.status == HalfCheckBoxStatus.CHECKED.index
                                             ? TextDecoration.lineThrough
                                             : TextDecoration.none,
-                                        color: task.status
+                                        color: task.status == HalfCheckBoxStatus.CHECKED.index
                                             ? _themeData.textTheme.body1.color
                                                 .withOpacity(_opacity)
                                             : _themeData.textTheme.body1.color),
                                   ),
-                                  CircularCheckBox(
-                                      value: task.status,
-                                      materialTapTargetSize:
-                                          MaterialTapTargetSize.padded,
-                                      onChanged: (bool x) {
-                                        _onTaskStatusChange(task.id, x);
-                                      }),
+                                  HalfCheckBox(
+                                    status: HalfCheckBoxStatus.values[task.status],
+                                    color: _themeData.primaryColor,
+                                    onPressed: () {
+                                      _onTaskStatusChange(task.id);
+                                    },
+                                  )
                                 ],
                               ),
                             ),
@@ -276,12 +284,15 @@ class CalendarState extends State<Calendar> {
   ///
   /// 设置事件
   ///
-  setDateTask(DateTime dateTime, List<Task> tasks) {
+  setDateTask(DateTime dateTime, List<TimeTask> tasks) {
     setState(() {
       _date = dateTime;
       _tasks = tasks;
-      double height =
-          _height - _rowHeight - _lineHeight - 2 * _listPadding - _tasks.length * _taskHeight;
+      double height = _height -
+          _rowHeight -
+          _lineHeight -
+          2 * _listPadding -
+          _tasks.length * _taskHeight;
       _blankHeight = height > 0 ? height : 0.0;
     });
   }

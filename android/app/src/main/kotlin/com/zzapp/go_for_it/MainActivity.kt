@@ -1,4 +1,4 @@
-package com.zzapp.gtd_task
+package com.zzapp.go_for_it
 
 import android.os.Bundle
 

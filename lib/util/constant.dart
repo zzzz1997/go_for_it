@@ -2,7 +2,11 @@
 /// 常量工具类
 ///
 class Constant {
-  static final appTag = 'GTD任务管理';
+  static final appTag = 'GoForIt';
+
+  static final unknownArea = '未知领域';
+
+  static final dbName = 'go_for_it';
 
   static final width = 1080;
   static final height = 1920;
@@ -11,5 +15,12 @@ class Constant {
 
   static final week = ['一', '二', '三', '四', '五', '六', '日'];
 
-  static final todaySvg = 'assets/images/today.svg';
+  static final todaySVG = 'assets/images/today.svg';
+
+  static final tabTexts = ['打卡', '时间表', '待办'];
+  static final tabSVGs = [
+    'assets/images/clock.svg',
+    'assets/images/time.svg',
+    'assets/images/todo.svg'
+  ];
 }
