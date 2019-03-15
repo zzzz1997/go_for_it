@@ -12,13 +12,18 @@ import 'package:go_for_it/util/constant.dart';
 ///
 class TimeFragment extends StatelessWidget {
 
-  // 日历键
-  final GlobalKey<CalendarState> _calendarKey = GlobalKey();
-
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainStateModel>(
       builder: (context, widget, model) {
+        double _height = ScreenUtil().setHeight(Constant.height) -
+          Constant.appBarHeight -
+          MediaQueryData.fromWindow(window).padding.top;
+        double _rowHeight = _height -
+          Constant.rowHeight -
+          Constant.lineHeight -
+          2 * Constant.listPadding -
+          model.tasks.length * Constant.taskHeight;
         return Scaffold(
           appBar: AppBar(
             title: Text('${model.date.month}/${model.date.day}'),
@@ -27,7 +32,6 @@ class TimeFragment extends StatelessWidget {
                 ? GestureDetector(
                 onTap: () {
                   model.setDate(model.today);
-                  _calendarKey.currentState.setDateTask(model.today, model.tasks);
                 },
                 child: SvgPicture.asset(
                   Constant.todaySVG,
@@ -40,21 +44,26 @@ class TimeFragment extends StatelessWidget {
           ),
           body: ScreenUtil().setWidth(Constant.width) > 0
             ? Calendar(
-            key: _calendarKey,
             width: ScreenUtil().setWidth(Constant.width),
-            height: ScreenUtil().setHeight(Constant.height) -
-              Constant.appBarHeight -
-              MediaQueryData.fromWindow(window).padding.top,
+            height: _height,
             themeData: model.themeData,
             today: model.today,
             date: model.date,
             tasks: model.tasks,
+            rowHeight: _rowHeight > 0 ? _rowHeight : 0.0,
+            swiperIndex: model.swiperIndex,
+            isWeek: model.isWeek,
             onDateChange: (DateTime dateTime) {
               model.setDate(dateTime);
-              _calendarKey.currentState.setDateTask(model.date, model.tasks);
             },
             onTaskStatusChange: (int id) {
               model.changeTaskStatus(id);
+            },
+            onSwiperIndexChange: (int index) {
+              model.changeSwiperIndex(index);
+            },
+            onScroll: (double position) {
+              model.onScroll(position);
             },
           )
             : SizedBox(),

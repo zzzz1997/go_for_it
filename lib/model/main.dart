@@ -2,11 +2,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:go_for_it/entity/time_task.dart';
+import 'package:go_for_it/model/calendar.dart';
 
 ///
 /// 主状态管理
 ///
-class MainStateModel extends Model {
+class MainStateModel extends Model with CalendarModel {
   // 定义主题
   ThemeData _themeData;
 

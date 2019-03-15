@@ -53,6 +53,7 @@ class _HomePageState extends State<HomePage> {
           itemCount: _items.length,
           itemBuilder: _buildItems,
           onIndexChanged: _onIndexChanged,
+          loop: false,
         ),
         bottomNavigationBar: BottomNavigationBar(
           items: _items,
