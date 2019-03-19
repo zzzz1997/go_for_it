@@ -6,6 +6,18 @@ import 'package:go_for_it/util/constant.dart';
 ///
 abstract class CalendarModel extends Model {
 
+  // 今天
+  DateTime _today;
+
+  // 获取今天
+  DateTime get today => _today;
+
+  // 选择日期
+  DateTime _date;
+
+  // 获取所选日期
+  DateTime get date => _date;
+
   // scrollController位移
   double _offset = Constant.lineHeight * (Constant.monthLines - 1);
 
@@ -25,6 +37,24 @@ abstract class CalendarModel extends Model {
   int get swiperIndex => _swiperIndex;
 
   factory CalendarModel._() => null;
+
+  ///
+  /// 初始化时间
+  ///
+  DateTime initDate() {
+    _today =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    _date =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    return _date;
+  }
+
+  ///
+  /// 设置当前时间
+  ///
+  setDate(DateTime dateTime) {
+    _date = dateTime;
+  }
 
   ///
   /// 更改swiper位置

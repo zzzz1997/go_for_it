@@ -19,7 +19,7 @@ class ClockFragment extends StatelessWidget {
             MediaQueryData.fromWindow(window).padding.top;
         double _rowHeight = _height -
             Constant.rowHeight -
-            Constant.lineHeight -
+            2 * Constant.lineHeight -
             2 * Constant.listPadding -
             model.tasks.length * Constant.taskHeight;
         return Scaffold(
@@ -36,7 +36,7 @@ class ClockFragment extends StatelessWidget {
                   swiperIndex: model.swiperIndex,
                   isWeek: model.isWeek,
                   onDateChange: (DateTime dateTime) {
-                    model.setDate(dateTime);
+                    model.updateDate(dateTime);
                   },
                   onTaskStatusChange: (int id) {
                     model.changeTaskStatus(id);

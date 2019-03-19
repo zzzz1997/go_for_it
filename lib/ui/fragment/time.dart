@@ -31,7 +31,7 @@ class TimeFragment extends StatelessWidget {
               model.date != model.today
                 ? GestureDetector(
                 onTap: () {
-                  model.setDate(model.today);
+                  model.updateDate(model.today);
                 },
                 child: SvgPicture.asset(
                   Constant.todaySVG,
@@ -54,7 +54,7 @@ class TimeFragment extends StatelessWidget {
             swiperIndex: model.swiperIndex,
             isWeek: model.isWeek,
             onDateChange: (DateTime dateTime) {
-              model.setDate(dateTime);
+              model.updateDate(dateTime);
             },
             onTaskStatusChange: (int id) {
               model.changeTaskStatus(id);

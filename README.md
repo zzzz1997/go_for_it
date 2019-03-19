@@ -1,4 +1,4 @@
-# gtd_task
+# go_for_it
 
 A new Flutter application.
 
