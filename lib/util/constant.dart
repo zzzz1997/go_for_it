@@ -26,18 +26,22 @@ class Constant {
 
   // 页面数
   static final pageLength = 3;
+
   // 一周周期
   static final weekLength = 7;
+
   // 月周行数
   static final monthLines = 6;
+
   // 月周高度
   static final lineHeight = 50.0;
-  // 任务高度
-  static final taskHeight = 50.0;
+
   // 列表边距
   static final listPadding = 10.0;
+
   // 其他月日期透明度
   static final opacity = 0.3;
+
   // 周行高
   static final rowHeight = 20.0;
 }

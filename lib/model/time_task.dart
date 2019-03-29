@@ -6,7 +6,6 @@ import 'package:go_for_it/entity/time_task.dart';
 /// 普通任务管理
 ///
 abstract class TimeTaskModel extends Model {
-
   // 任务列表
   List<TimeTask> _tasks;
 
@@ -18,15 +17,14 @@ abstract class TimeTaskModel extends Model {
   ///
   /// 刷新任务列表
   ///
-  List<TimeTask> getTask(DateTime dateTime) {
+  getTask(DateTime dateTime) {
     Random random = Random();
-    int length = random.nextInt(15) + 5;
-    List<TimeTask> tasks = List(length);
+    int length = random.nextInt(10) + 5;
+    _tasks = List(length);
     for (int i = 0; i < length; i++) {
       tasks[i] =
-        TimeTask(i, '${dateTime.day}日的任务$i', 0, 0, 0, random.nextInt(2), 0);
+          TimeTask(i, '${dateTime.day}日的任务$i', random.nextInt(4), dateTime.millisecondsSinceEpoch + random.nextInt(86400000), 0, random.nextInt(2), 0);
     }
-    return tasks;
   }
 
   ///

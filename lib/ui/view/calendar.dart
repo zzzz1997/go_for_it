@@ -1,32 +1,26 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:go_for_it/entity/time_task.dart';
-import 'package:go_for_it/ui/view/half_check_box.dart';
 import 'package:go_for_it/util/constant.dart';
 
 ///
 /// 日历组件
 ///
 class Calendar extends StatelessWidget {
-
-  Calendar(
-    {Key key,
-      @required this.width,
-      @required this.height,
-      @required this.themeData,
-      @required this.today,
-      @required this.date,
-      @required this.tasks,
-      @required this.rowHeight,
-      @required this.swiperIndex,
-      @required this.isWeek,
-      @required this.onDateChange,
-      @required this.onTaskStatusChange,
-      @required this.onSwiperIndexChange,
-      @required this.onScroll,
-    })
-    : super(key: key);
+  Calendar({
+    Key key,
+    @required this.width,
+    @required this.height,
+    @required this.themeData,
+    @required this.today,
+    @required this.date,
+    @required this.swiperIndex,
+    @required this.isWeek,
+    @required this.delegate,
+    @required this.onDateChange,
+    @required this.onSwiperIndexChange,
+    @required this.onScroll,
+  }) : super(key: key);
 
   // 宽度
   final double width;
@@ -43,23 +37,17 @@ class Calendar extends StatelessWidget {
   // 所选日期
   final DateTime date;
 
-  // 任务列表
-  final List<TimeTask> tasks;
-
-  // 星期行高度
-  final double rowHeight;
-
   // swiper位置
   final int swiperIndex;
 
   // 是否周视图
   final bool isWeek;
 
+  // 滑动构造器
+  final SliverChildBuilderDelegate delegate;
+
   // 日期更改事件
   final Function onDateChange;
-
-  // 任务状态更改时间
-  final Function onTaskStatusChange;
 
   // swiper换页事件
   final Function onSwiperIndexChange;
@@ -67,7 +55,8 @@ class Calendar extends StatelessWidget {
   final Function onScroll;
 
   // 滑动控制器
-  final ScrollController _scrollController = ScrollController(initialScrollOffset: Constant.lineHeight * (Constant.monthLines - 1));
+  final ScrollController _scrollController = ScrollController(
+      initialScrollOffset: Constant.lineHeight * (Constant.monthLines - 1));
 
   @override
   Widget build(BuildContext context) {
@@ -76,130 +65,96 @@ class Calendar extends StatelessWidget {
       onScroll(_scrollController.offset);
     });
     return SizedBox(
-      width: width,
-      height: height,
-      child: Column(
-        children: <Widget>[
-          SizedBox(
-            height: Constant.rowHeight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: Constant.week
-                .map((w) => Text(
-                w,
-                style: TextStyle(
-                  color:
-                  w == Constant.week[5] || w == Constant.week[6]
-                    ? themeData.primaryColor
-                    : themeData.textTheme.body1.color),
-              ))
-                .toList(),
-            ),
-          ),
-          Expanded(
-            child: CustomScrollView(
-              controller: _scrollController,
-              shrinkWrap: true,
-              physics:
-              _SnappingScrollPhysics(midScrollOffset: _midScrollOffset),
-              slivers: <Widget>[
-                SliverPersistentHeader(
-                  pinned: true,
-                  floating: true,
-                  delegate: _SliverAppBarDelegate(
-                    minHeight: Constant.lineHeight,
-                    maxHeight: Constant.lineHeight * Constant.monthLines,
-                    child: Swiper(
-                      itemCount: Constant.pageLength,
-                      index: swiperIndex,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ClipRect(
-                          child: _CalendarView(
-                            width: width,
-                            themeData: themeData,
-                            today: today,
-                            date: date,
-                            isWeek: isWeek,
-                            swiperIndex: swiperIndex,
-                            index: index,
-                            onDateChange: onDateChange,
-                          ),
-                        );
-                      },
-                      onIndexChanged: (int index) {
-                        bool isLeftScroll =
-                        _isLeftScroll(swiperIndex, index);
-                        onSwiperIndexChange(index);
-                        if (isLeftScroll) {
-                          if (isWeek) {
-                            onDateChange(date.subtract(Duration(
-                              days: Constant.weekLength + date.weekday - 1)));
-                          } else {
-                            onDateChange(
-                              DateTime(date.year, date.month - 1, 1));
-                          }
-                        } else {
-                          if (isWeek) {
-                            onDateChange(date.add(Duration(
-                              days: Constant.weekLength - date.weekday + 1)));
-                          } else {
-                            onDateChange(
-                              DateTime(date.year, date.month + 1, 1));
-                          }
-                        }
-                      },
-                    ),
-                  )),
-                SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: Constant.listPadding),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                        if (index == tasks.length) {
-                          return SizedBox(
-                            height: rowHeight,
-                          );
-                        }
-                        TimeTask task = tasks[index];
-                        return SizedBox(
-                          height: Constant.taskHeight,
-                          child: Card(
-                            child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  task.name,
-                                  style: TextStyle(
-                                    decoration: task.status == HalfCheckBoxStatus.CHECKED.index
-                                      ? TextDecoration.lineThrough
-                                      : TextDecoration.none,
-                                    color: task.status == HalfCheckBoxStatus.CHECKED.index
-                                      ? themeData.textTheme.body1.color
-                                      .withOpacity(Constant.opacity)
+        width: width,
+        height: height,
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: Constant.rowHeight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: Constant.week
+                    .map((w) => Text(
+                          w,
+                          style: TextStyle(
+                              color:
+                                  w == Constant.week[5] || w == Constant.week[6]
+                                      ? themeData.primaryColor
                                       : themeData.textTheme.body1.color),
-                                ),
-                                HalfCheckBox(
-                                  status: HalfCheckBoxStatus.values[task.status],
-                                  color: themeData.primaryColor,
-                                  onPressed: () {
-                                    onTaskStatusChange(task.id);
-                                  },
-                                )
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      childCount: tasks.length + 1,
-                    ),
-                  ),
-                )
-              ],
+                        ))
+                    .toList(),
+              ),
             ),
-          )
-        ],
-      ));
+            Expanded(
+              child: CustomScrollView(
+                controller: _scrollController,
+                shrinkWrap: true,
+                physics:
+                    _SnappingScrollPhysics(midScrollOffset: _midScrollOffset),
+                slivers: <Widget>[
+                  SliverPersistentHeader(
+                      pinned: true,
+                      floating: true,
+                      delegate: _SliverAppBarDelegate(
+                        minHeight: Constant.lineHeight,
+                        maxHeight: Constant.lineHeight * Constant.monthLines,
+                        child: Swiper(
+                          itemCount: Constant.pageLength,
+                          index: swiperIndex,
+                          itemBuilder: (BuildContext context, int index) {
+                            return ClipRect(
+                              child: _CalendarView(
+                                width: width,
+                                themeData: themeData,
+                                today: today,
+                                date: date,
+                                isWeek: isWeek,
+                                swiperIndex: swiperIndex,
+                                index: index,
+                                onDateChange: onDateChange,
+                              ),
+                            );
+                          },
+                          onIndexChanged: (int index) {
+                            bool isLeftScroll =
+                                _isLeftScroll(swiperIndex, index);
+                            onSwiperIndexChange(index);
+                            if (isLeftScroll) {
+                              if (isWeek) {
+                                onDateChange(date.subtract(Duration(
+                                    days: Constant.weekLength +
+                                        date.weekday -
+                                        1)));
+                              } else {
+                                onDateChange(
+                                    DateTime(date.year, date.month - 1, 1));
+                              }
+                            } else {
+                              if (isWeek) {
+                                onDateChange(date.add(Duration(
+                                    days: Constant.weekLength -
+                                        date.weekday +
+                                        1)));
+                              } else {
+                                onDateChange(
+                                    DateTime(date.year, date.month + 1, 1));
+                              }
+                            }
+                          },
+                        ),
+                      )),
+                  SliverPadding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: Constant.listPadding),
+                    sliver: SliverList(
+                      delegate: delegate,
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
+        ));
   }
 
   ///
@@ -224,33 +179,33 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
     ScrollPhysics parent,
     @required this.midScrollOffset,
   })  : assert(midScrollOffset != null),
-      super(parent: parent);
+        super(parent: parent);
 
   final double midScrollOffset;
 
   @override
   _SnappingScrollPhysics applyTo(ScrollPhysics ancestor) {
     return _SnappingScrollPhysics(
-      parent: buildParent(ancestor), midScrollOffset: midScrollOffset);
+        parent: buildParent(ancestor), midScrollOffset: midScrollOffset);
   }
 
   Simulation _toMidScrollOffsetSimulation(double offset, double dragVelocity) {
     final double velocity = max(dragVelocity, minFlingVelocity);
     return ScrollSpringSimulation(spring, offset, midScrollOffset, velocity,
-      tolerance: tolerance);
+        tolerance: tolerance);
   }
 
   Simulation _toZeroScrollOffsetSimulation(double offset, double dragVelocity) {
     final double velocity = max(dragVelocity, minFlingVelocity);
     return ScrollSpringSimulation(spring, offset, 0.0, velocity,
-      tolerance: tolerance);
+        tolerance: tolerance);
   }
 
   @override
   Simulation createBallisticSimulation(
-    ScrollMetrics position, double dragVelocity) {
+      ScrollMetrics position, double dragVelocity) {
     final Simulation simulation =
-    super.createBallisticSimulation(position, dragVelocity);
+        super.createBallisticSimulation(position, dragVelocity);
     final double offset = position.pixels;
 
     if (simulation != null) {
@@ -298,15 +253,15 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-    BuildContext context, double shrinkOffset, bool overlapsContent) {
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox.expand(child: child);
   }
 
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return maxHeight != oldDelegate.maxHeight ||
-      minHeight != oldDelegate.minHeight ||
-      child != oldDelegate.child;
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 
   @override
@@ -365,19 +320,22 @@ class _CalendarView extends AnimatedWidget {
       List<Widget> widgets = List();
       for (int i = 0; i < Constant.weekLength; i++) {
         DateTime dateTime = date.add(Duration(
-          days: i - date.weekday + 1 + Constant.weekLength * _indexOffset(index)));
+            days: i -
+                date.weekday +
+                1 +
+                Constant.weekLength * _indexOffset(index)));
         widgets.add(_buildDate(dateTime, isWeek: true));
       }
       return SizedBox(
-        width: width,
-        height: Constant.lineHeight,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: widgets,
-        ));
+          width: width,
+          height: Constant.lineHeight,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: widgets,
+          ));
     } else {
       DateTime firstDay =
-      DateTime(date.year, date.month + _indexOffset(index), 1);
+          DateTime(date.year, date.month + _indexOffset(index), 1);
       int preLength = firstDay.weekday - 1;
       List<Widget> widgets = List();
       int _lineIndex = 0;
@@ -391,16 +349,16 @@ class _CalendarView extends AnimatedWidget {
       List<Widget> children = List();
       for (int i = 0; i < Constant.monthLines; i++) {
         children.add(LayoutId(
-          id: 'week$i',
-          child: SizedBox(
-            width: width,
-            height: Constant.lineHeight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children:
-              widgets.sublist(Constant.weekLength * i, Constant.weekLength * (i + 1)),
-            ),
-          )));
+            id: 'week$i',
+            child: SizedBox(
+              width: width,
+              height: Constant.lineHeight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: widgets.sublist(
+                    Constant.weekLength * i, Constant.weekLength * (i + 1)),
+              ),
+            )));
       }
       return CustomMultiChildLayout(
         delegate: _CalendarLayout(lineIndex: _lineIndex),
@@ -425,22 +383,22 @@ class _CalendarView extends AnimatedWidget {
           padding: EdgeInsets.all(5.0),
           child: Container(
             decoration: BoxDecoration(
-              color: dateTime == date
-                ? themeData.primaryColor
-                : Colors.transparent,
-              shape: BoxShape.circle),
+                color: dateTime == date
+                    ? themeData.primaryColor
+                    : Colors.transparent,
+                shape: BoxShape.circle),
             child: Center(
               child: Text(dateTime.day.toString(),
-                style: TextStyle(
-                  color: dateTime == date
-                    ? Colors.white
-                    : dateTime == today
-                    ? themeData.primaryColor
-                    : dateTime.month == date.month || isWeek
-                    ? themeData.textTheme.body1.color
-                    : themeData.textTheme.body1.color
-                    .withOpacity(Constant.opacity),
-                )),
+                  style: TextStyle(
+                    color: dateTime == date
+                        ? Colors.white
+                        : dateTime == today
+                            ? themeData.primaryColor
+                            : dateTime.month == date.month || isWeek
+                                ? themeData.textTheme.body1.color
+                                : themeData.textTheme.body1.color
+                                    .withOpacity(Constant.opacity),
+                  )),
             ),
           ),
         ),
@@ -473,9 +431,9 @@ class _CalendarLayout extends MultiChildLayoutDelegate {
       if (hasChild(weekId)) {
         layoutChild(weekId, BoxConstraints(maxHeight: Constant.lineHeight));
         double dy = Constant.lineHeight * i -
-          lineIndex *
-            (Constant.monthLines * Constant.lineHeight - size.height) /
-            (Constant.monthLines - 1);
+            lineIndex *
+                (Constant.monthLines * Constant.lineHeight - size.height) /
+                (Constant.monthLines - 1);
         positionChild(weekId, Offset(0.0, dy));
       }
     }
