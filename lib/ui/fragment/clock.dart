@@ -2,14 +2,20 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_for_it/entity/time_task.dart';
+import 'package:go_for_it/entity/clock_step.dart';
+import 'package:go_for_it/entity/clock_task.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/view/calendar.dart';
+import 'package:go_for_it/ui/view/clock_progress.dart';
 import 'package:go_for_it/ui/view/half_check_box.dart';
+import 'package:go_for_it/ui/view/importance_view.dart';
 import 'package:go_for_it/util/constant.dart';
 
 // 任务高度
 const _taskHeight = 70.0;
+
+// 卡片边距（list使用card包裹需要填充边距）
+const _cardPadding = 4;
 
 ///
 /// 每日打卡
@@ -20,77 +26,127 @@ class ClockFragment extends StatelessWidget {
     return ScopedModelDescendant<MainStateModel>(
       builder: (context, widget, model) {
         double _height = ScreenUtil().setHeight(Constant.height) -
-            Constant.appBarHeight -
-            MediaQueryData.fromWindow(window).padding.top;
+          Constant.appBarHeight -
+          MediaQueryData
+            .fromWindow(window)
+            .padding
+            .top;
         double _rowHeight = _height -
-            Constant.rowHeight -
-            2 * Constant.lineHeight -
-            2 * Constant.listPadding -
-            model.tasks.length * _taskHeight;
+          CalendarParam.rowHeight -
+          2 * CalendarParam.lineHeight -
+          2 * CalendarParam.listPadding -
+          model.clockTasks.length * _taskHeight + _cardPadding;
         return Scaffold(
           appBar: AppBar(),
           body: ScreenUtil().setWidth(Constant.width) > 0
-              ? Calendar(
-                  width: ScreenUtil().setWidth(Constant.width),
-                  height: _height,
-                  themeData: model.themeData,
-                  today: model.today,
-                  date: model.date,
-                  swiperIndex: model.swiperIndex,
-                  isWeek: model.isWeek,
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      if (index == model.tasks.length) {
-                        return SizedBox(
-                          height: _rowHeight > 0 ? _rowHeight : 0.0,
-                        );
-                      }
-                      TimeTask task = model.tasks[index];
-                      return SizedBox(
-                        height: _taskHeight,
-                        child: Card(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                task.name,
-                                style: TextStyle(
-                                    decoration: task.status ==
-                                            HalfCheckBoxStatus.CHECKED.index
-                                        ? TextDecoration.lineThrough
-                                        : TextDecoration.none,
-                                    color: task.status ==
-                                            HalfCheckBoxStatus.CHECKED.index
-                                        ? model.themeData.textTheme.body1.color
-                                            .withOpacity(Constant.opacity)
-                                        : model
-                                            .themeData.textTheme.body1.color),
-                              ),
-                              HalfCheckBox(
-                                status: HalfCheckBoxStatus.values[task.status],
-                                color: model.themeData.primaryColor,
-                                onPressed: () {
-                                  model.changeTaskStatus(task.id);
-                                },
-                              )
-                            ],
-                          ),
+            ? Calendar(
+            width: ScreenUtil().setWidth(Constant.width),
+            height: _height,
+            themeData: model.themeData,
+            startDayOfWeek: model.user.startDayOfWeek,
+            language: model.user.language,
+            today: model.today,
+            date: model.date,
+            swiperIndex: model.swiperIndex,
+            isWeek: model.isWeek,
+            delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                if (index == model.clockTasks.length) {
+                  return SizedBox(
+                    height: _rowHeight > 0 ? _rowHeight : 0.0,
+                  );
+                }
+                ClockTask task = model.clockTasks[index];
+                List<ClockStep> steps = model.clockSteps
+                  .where((step) =>
+                step.clockTaskId == task.id).toList();
+                int length = steps.length;
+                List<int> data = List(length);
+                for (int i = 0; i < length; i++) {
+                  data[i] = DateTime
+                    .fromMillisecondsSinceEpoch(steps[i].createdTime * 1000)
+                    .difference(DateTime.fromMillisecondsSinceEpoch(
+                    task.startTime * 1000))
+                    .inDays;
+                }
+                return Material(
+                  child: SizedBox(
+                    height: _taskHeight,
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                ImportanceView(importance: task.importance),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      task.name,
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text.rich(
+                                      TextSpan(children: <TextSpan>[
+                                        TextSpan(text: '已坚持'),
+                                        TextSpan(
+                                          text:
+                                          length
+                                            .toString(),
+                                          style:
+                                          TextStyle(color: Colors.red)),
+                                        TextSpan(text: '天')
+                                      ]),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            HalfCheckBox(
+                              status: HalfCheckBoxStatus.values[1],
+                              color: model.themeData.primaryColor,
+                              onPressed: () {
+                                // model.changeTaskStatus(task.id);
+                              },
+                            )
+                          ],
                         ),
-                      );
-                    },
-                    childCount: model.tasks.length + 1,
+                        ClockProgress(
+                          width: ScreenUtil().setWidth(Constant.width),
+                          height: 5,
+                          frontColor: Colors.grey,
+                          backColor: Colors.grey.withOpacity(0.2),
+                          total: DateTime
+                            .fromMillisecondsSinceEpoch(task.endTime * 1000)
+                            .difference(DateTime.fromMillisecondsSinceEpoch(
+                            task.startTime * 1000))
+                            .inDays
+                            .abs(),
+                          data: data,
+                        )
+                      ],
+                    )
                   ),
-                  onDateChange: (DateTime dateTime) {
-                    model.updateDate(dateTime);
-                  },
-                  onSwiperIndexChange: (int index) {
-                    model.changeSwiperIndex(index);
-                  },
-                  onScroll: (double position) {
-                    model.onScroll(position);
-                  },
-                )
-              : SizedBox(),
+                );
+              },
+              childCount: model.clockTasks.length + 1,
+            ),
+            onDateChange: (DateTime dateTime) {
+              model.updateDate(dateTime);
+            },
+            onSwiperIndexChange: (int index) {
+              model.changeSwiperIndex(index);
+            },
+            onScroll: (double position) {
+              model.onScroll(position);
+            },
+          )
+            : SizedBox(),
         );
       },
     );

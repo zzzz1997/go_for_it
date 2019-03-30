@@ -1,17 +1,46 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:go_for_it/util/constant.dart';
+
+class CalendarParam {
+  // 中文星期
+  static final weekCh = ['一', '二', '三', '四', '五', '六', '日'];
+
+  // 英文星期
+  static final weekEn = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // 页面数
+  static final pageLength = 3;
+
+  // 一周周期
+  static final weekLength = 7;
+
+  // 月周行数
+  static final monthLines = 6;
+
+  // 月周高度
+  static final lineHeight = 50.0;
+
+  // 列表边距
+  static final listPadding = 10.0;
+
+  // 其他月日期透明度
+  static final opacity = 0.3;
+
+  // 周行高
+  static final rowHeight = 20.0;
+}
 
 ///
 /// 日历组件
 ///
 class Calendar extends StatelessWidget {
   Calendar({
-    Key key,
     @required this.width,
     @required this.height,
     @required this.themeData,
+    @required this.startDayOfWeek,
+    @required this.language,
     @required this.today,
     @required this.date,
     @required this.swiperIndex,
@@ -20,7 +49,11 @@ class Calendar extends StatelessWidget {
     @required this.onDateChange,
     @required this.onSwiperIndexChange,
     @required this.onScroll,
-  }) : super(key: key);
+  })  : assert(startDayOfWeek >= 0 && startDayOfWeek <= 7),
+        assert(swiperIndex >= 0 && swiperIndex <= 2),
+        assert(onDateChange != null),
+        assert(onSwiperIndexChange != null),
+        assert(onScroll != null);
 
   // 宽度
   final double width;
@@ -30,6 +63,12 @@ class Calendar extends StatelessWidget {
 
   // 主题
   final ThemeData themeData;
+
+  // 开始星期
+  final int startDayOfWeek;
+
+  // 语言
+  final int language;
 
   // 今天
   final DateTime today;
@@ -56,11 +95,13 @@ class Calendar extends StatelessWidget {
 
   // 滑动控制器
   final ScrollController _scrollController = ScrollController(
-      initialScrollOffset: Constant.lineHeight * (Constant.monthLines - 1));
+      initialScrollOffset:
+          CalendarParam.lineHeight * (CalendarParam.monthLines - 1));
 
   @override
   Widget build(BuildContext context) {
-    double _midScrollOffset = Constant.lineHeight * (Constant.monthLines - 1);
+    double _midScrollOffset =
+        CalendarParam.lineHeight * (CalendarParam.monthLines - 1);
     _scrollController.addListener(() {
       onScroll(_scrollController.offset);
     });
@@ -70,19 +111,10 @@ class Calendar extends StatelessWidget {
         child: Column(
           children: <Widget>[
             SizedBox(
-              height: Constant.rowHeight,
+              height: CalendarParam.rowHeight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: Constant.week
-                    .map((w) => Text(
-                          w,
-                          style: TextStyle(
-                              color:
-                                  w == Constant.week[5] || w == Constant.week[6]
-                                      ? themeData.primaryColor
-                                      : themeData.textTheme.body1.color),
-                        ))
-                    .toList(),
+                children: _buildWeek(),
               ),
             ),
             Expanded(
@@ -96,16 +128,18 @@ class Calendar extends StatelessWidget {
                       pinned: true,
                       floating: true,
                       delegate: _SliverAppBarDelegate(
-                        minHeight: Constant.lineHeight,
-                        maxHeight: Constant.lineHeight * Constant.monthLines,
+                        minHeight: CalendarParam.lineHeight,
+                        maxHeight:
+                            CalendarParam.lineHeight * CalendarParam.monthLines,
                         child: Swiper(
-                          itemCount: Constant.pageLength,
+                          itemCount: CalendarParam.pageLength,
                           index: swiperIndex,
                           itemBuilder: (BuildContext context, int index) {
                             return ClipRect(
                               child: _CalendarView(
                                 width: width,
                                 themeData: themeData,
+                                startDayOfWeek: startDayOfWeek,
                                 today: today,
                                 date: date,
                                 isWeek: isWeek,
@@ -122,9 +156,12 @@ class Calendar extends StatelessWidget {
                             if (isLeftScroll) {
                               if (isWeek) {
                                 onDateChange(date.subtract(Duration(
-                                    days: Constant.weekLength +
+                                    days: CalendarParam.weekLength +
                                         date.weekday -
-                                        1)));
+                                        startDayOfWeek +
+                                        (startDayOfWeek > date.weekday
+                                            ? 7
+                                            : 0))));
                               } else {
                                 onDateChange(
                                     DateTime(date.year, date.month - 1, 1));
@@ -132,9 +169,12 @@ class Calendar extends StatelessWidget {
                             } else {
                               if (isWeek) {
                                 onDateChange(date.add(Duration(
-                                    days: Constant.weekLength -
+                                    days: CalendarParam.weekLength -
                                         date.weekday +
-                                        1)));
+                                        startDayOfWeek -
+                                        (startDayOfWeek > date.weekday
+                                            ? 7
+                                            : 0))));
                               } else {
                                 onDateChange(
                                     DateTime(date.year, date.month + 1, 1));
@@ -143,18 +183,40 @@ class Calendar extends StatelessWidget {
                           },
                         ),
                       )),
-                  SliverPadding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: Constant.listPadding),
-                    sliver: SliverList(
-                      delegate: delegate,
-                    ),
-                  )
+                  SliverList(
+                    delegate: delegate,
+                  ),
                 ],
               ),
             )
           ],
         ));
+  }
+
+  ///
+  /// 构建星期栏
+  ///
+  List<Widget> _buildWeek() {
+    List<Widget> week = List(CalendarParam.weekLength);
+    for (int i = 0; i < CalendarParam.weekLength; i++) {
+      int index = startDayOfWeek - 1 + i;
+      index = index >= 7 ? index - CalendarParam.weekLength : index;
+      week[i] = SizedBox(
+        width: (width ~/ CalendarParam.weekLength).toDouble(),
+        child: Center(
+          child: Text(
+            language == 0
+                ? CalendarParam.weekCh[index]
+                : CalendarParam.weekEn[index],
+            style: TextStyle(
+                color: index == 5 || index == 6
+                    ? themeData.primaryColor
+                    : themeData.textTheme.body1.color),
+          ),
+        ),
+      );
+    }
+    return week;
   }
 
   ///
@@ -276,6 +338,7 @@ class _CalendarView extends AnimatedWidget {
     Key key,
     @required this.width,
     @required this.themeData,
+    @required this.startDayOfWeek,
     @required this.today,
     @required this.date,
     @required this.isWeek,
@@ -289,6 +352,9 @@ class _CalendarView extends AnimatedWidget {
 
   // 主题
   final ThemeData themeData;
+
+  // 开始星期
+  final int startDayOfWeek;
 
   // 今天
   final DateTime today;
@@ -318,17 +384,18 @@ class _CalendarView extends AnimatedWidget {
   Widget _build(BuildContext context, BoxConstraints constraints) {
     if (isWeek) {
       List<Widget> widgets = List();
-      for (int i = 0; i < Constant.weekLength; i++) {
+      for (int i = 0; i < CalendarParam.weekLength; i++) {
         DateTime dateTime = date.add(Duration(
             days: i -
                 date.weekday +
-                1 +
-                Constant.weekLength * _indexOffset(index)));
+                startDayOfWeek -
+                (startDayOfWeek > date.weekday ? CalendarParam.weekLength : 0) +
+                CalendarParam.weekLength * _indexOffset(index)));
         widgets.add(_buildDate(dateTime, isWeek: true));
       }
       return SizedBox(
           width: width,
-          height: Constant.lineHeight,
+          height: CalendarParam.lineHeight,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: widgets,
@@ -336,27 +403,30 @@ class _CalendarView extends AnimatedWidget {
     } else {
       DateTime firstDay =
           DateTime(date.year, date.month + _indexOffset(index), 1);
-      int preLength = firstDay.weekday - 1;
+      int preLength = firstDay.weekday - startDayOfWeek;
+      preLength = preLength < 0 ? preLength + 7 : preLength;
       List<Widget> widgets = List();
       int _lineIndex = 0;
-      for (int i = 0; i < Constant.weekLength * Constant.monthLines; i++) {
+      for (int i = 0;
+          i < CalendarParam.weekLength * CalendarParam.monthLines;
+          i++) {
         DateTime dateTime = firstDay.add(Duration(days: i - preLength));
         widgets.add(_buildDate(dateTime));
         if (dateTime == date) {
-          _lineIndex = i ~/ Constant.weekLength;
+          _lineIndex = i ~/ CalendarParam.weekLength;
         }
       }
       List<Widget> children = List();
-      for (int i = 0; i < Constant.monthLines; i++) {
+      for (int i = 0; i < CalendarParam.monthLines; i++) {
         children.add(LayoutId(
             id: 'week$i',
             child: SizedBox(
               width: width,
-              height: Constant.lineHeight,
+              height: CalendarParam.lineHeight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: widgets.sublist(
-                    Constant.weekLength * i, Constant.weekLength * (i + 1)),
+                children: widgets.sublist(CalendarParam.weekLength * i,
+                    CalendarParam.weekLength * (i + 1)),
               ),
             )));
       }
@@ -377,8 +447,8 @@ class _CalendarView extends AnimatedWidget {
       },
       containedInkWell: false,
       child: SizedBox(
-        width: (width ~/ Constant.weekLength).toDouble(),
-        height: Constant.lineHeight,
+        width: (width ~/ CalendarParam.weekLength).toDouble(),
+        height: CalendarParam.lineHeight,
         child: Padding(
           padding: EdgeInsets.all(5.0),
           child: Container(
@@ -397,7 +467,10 @@ class _CalendarView extends AnimatedWidget {
                             : dateTime.month == date.month || isWeek
                                 ? themeData.textTheme.body1.color
                                 : themeData.textTheme.body1.color
-                                    .withOpacity(Constant.opacity),
+                                    .withOpacity(CalendarParam.opacity),
+                    fontWeight: dateTime == today
+                        ? FontWeight.bold
+                        : themeData.textTheme.body1.fontWeight,
                   )),
             ),
           ),
@@ -426,14 +499,16 @@ class _CalendarLayout extends MultiChildLayoutDelegate {
 
   @override
   void performLayout(Size size) {
-    for (int i = 0; i < Constant.monthLines; i++) {
+    for (int i = 0; i < CalendarParam.monthLines; i++) {
       final String weekId = 'week$i';
       if (hasChild(weekId)) {
-        layoutChild(weekId, BoxConstraints(maxHeight: Constant.lineHeight));
-        double dy = Constant.lineHeight * i -
+        layoutChild(
+            weekId, BoxConstraints(maxHeight: CalendarParam.lineHeight));
+        double dy = CalendarParam.lineHeight * i -
             lineIndex *
-                (Constant.monthLines * Constant.lineHeight - size.height) /
-                (Constant.monthLines - 1);
+                (CalendarParam.monthLines * CalendarParam.lineHeight -
+                    size.height) /
+                (CalendarParam.monthLines - 1);
         positionChild(weekId, Offset(0.0, dy));
       }
     }

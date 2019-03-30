@@ -1,5 +1,5 @@
 import 'package:scoped_model/scoped_model.dart';
-import 'package:go_for_it/util/constant.dart';
+import 'package:go_for_it/ui/view/calendar.dart';
 
 ///
 /// 日历管理
@@ -19,7 +19,7 @@ abstract class CalendarModel extends Model {
   DateTime get date => _date;
 
   // scrollController位移
-  double _offset = Constant.lineHeight * (Constant.monthLines - 1);
+  double _offset = CalendarParam.lineHeight * (CalendarParam.monthLines - 1);
 
   // 获取scrollController位移
   double get offset => _offset;
@@ -69,8 +69,8 @@ abstract class CalendarModel extends Model {
   ///
   onScroll(offset) {
     _offset = offset;
-    double _midScrollOffset = Constant.lineHeight * (Constant.monthLines - 1);
-    bool isWeek = offset >= _midScrollOffset || (_midScrollOffset - offset) < 1;
+    double _midScrollOffset = CalendarParam.lineHeight * (CalendarParam.monthLines - 1);
+    bool isWeek = offset >= _midScrollOffset || (_midScrollOffset - offset) < 5;
     if (_isWeek != isWeek) {
       _isWeek = isWeek;
       notifyListeners();
