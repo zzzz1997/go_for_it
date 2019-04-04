@@ -3,11 +3,14 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/fragment/clock.dart';
 import 'package:go_for_it/ui/fragment/time.dart';
 import 'package:go_for_it/ui/fragment/todo.dart';
+import 'package:go_for_it/ui/page/setting.dart';
 import 'package:go_for_it/util/constant.dart';
+import 'package:go_for_it/util/transition.dart';
 
 ///
 /// 主页面
@@ -33,6 +36,23 @@ class HomePage extends StatelessWidget {
         ));
       }
       return Scaffold(
+        appBar: AppBar(
+          title: Text('${model.date.month}/${model.date.day}'),
+          actions: <Widget>[
+            model.date != model.today
+                ? GestureDetector(
+                    onTap: () {
+                      model.updateDate(model.today);
+                    },
+                    child: SvgPicture.asset(
+                      Constant.todaySVG,
+                      width: 24.0,
+                      color: Colors.white,
+                    ),
+                  )
+                : SizedBox(),
+          ],
+        ),
         body: Swiper(
           controller: _swiperController,
           itemCount: _items.length,
@@ -48,6 +68,42 @@ class HomePage extends StatelessWidget {
           onTap: (int index) {
             _onBarTap(model, index);
           },
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              UserAccountsDrawerHeader(
+                accountName: Text(model.user.username),
+                accountEmail: Text(Constant.appTag),
+                currentAccountPicture: CircleAvatar(
+                    backgroundImage: CachedNetworkImageProvider(
+                        'https://res2.webinn.online/assets/avatar/animal3.png')),
+              ),
+              ClipRect(
+                  child: Column(
+                children: <Widget>[
+                  ListTile(
+                    onTap: () {
+                      _onSettingTap(context);
+                    },
+                    leading: Icon(Icons.settings),
+                    title: Text(Constant.setting),
+                  ),
+                  ListTile(
+                    onTap: null,
+                    leading: Icon(Icons.exit_to_app),
+                    title: Text('退出登录'),
+                  )
+                ],
+              ))
+            ],
+          ),
+          semanticLabel: 'hhh',
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: null,
+          backgroundColor: model.themeData.primaryColor,
+          child: Icon(Icons.add),
         ),
       );
     });
@@ -91,5 +147,13 @@ class HomePage extends StatelessWidget {
   _onBarTap(MainStateModel model, int index) {
     _swiperController.move(index);
     model.changePage(index);
+  }
+
+  ///
+  /// 点击设置
+  ///
+  _onSettingTap(context) {
+    Transition.navigatorPush(
+        context, SettingPage(), TransitionType.inFromRight);
   }
 }

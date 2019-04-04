@@ -93,6 +93,6 @@ class _ClockProgressPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_ClockProgressPainter oldDelegate) {
-    return oldDelegate.total != total || oldDelegate.data != total;
+    return oldDelegate.total != total || oldDelegate.data != data;
   }
 }

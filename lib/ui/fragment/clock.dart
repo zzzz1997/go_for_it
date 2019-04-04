@@ -37,7 +37,6 @@ class ClockFragment extends StatelessWidget {
           2 * CalendarParam.listPadding -
           model.clockTasks.length * _taskHeight + _cardPadding;
         return Scaffold(
-          appBar: AppBar(),
           body: ScreenUtil().setWidth(Constant.width) > 0
             ? Calendar(
             width: ScreenUtil().setWidth(Constant.width),

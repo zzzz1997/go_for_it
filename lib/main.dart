@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/page/home.dart';
+import 'package:go_for_it/ui/page/setting.dart';
 import 'package:go_for_it/util/constant.dart';
 
 ///
@@ -31,6 +32,7 @@ class MyAppState extends State<MyApp> {
         home: HomePage(),
         routes: <String, WidgetBuilder>{
           '/home': (BuildContext context) => HomePage(),
+          '/setting': (BuildContext context) => SettingPage(),
         },
       ),
     );

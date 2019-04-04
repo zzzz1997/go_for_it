@@ -21,4 +21,9 @@ class Constant {
     'assets/images/time.svg',
     'assets/images/todo.svg'
   ];
+
+  static final setting = '设置';
+  static final weekLanguage = '星期语言';
+  static final weekStart = '星期开始于';
+  static final languages = [ '中文', 'English' ];
 }

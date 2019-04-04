@@ -35,23 +35,6 @@ class TimeFragment extends StatelessWidget {
           model.timeTasks.length * _taskHeight +
           _cardPadding;
       return Scaffold(
-        appBar: AppBar(
-          title: Text('${model.date.month}/${model.date.day}'),
-          actions: <Widget>[
-            model.date != model.today
-                ? GestureDetector(
-                    onTap: () {
-                      model.updateDate(model.today);
-                    },
-                    child: SvgPicture.asset(
-                      Constant.todaySVG,
-                      width: 24.0,
-                      color: Colors.white,
-                    ),
-                  )
-                : SizedBox(),
-          ],
-        ),
         body: ScreenUtil().setWidth(Constant.width) > 0
             ? Calendar(
                 width: ScreenUtil().setWidth(Constant.width),
