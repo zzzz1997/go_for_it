@@ -1,6 +1,9 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:go_for_it/entity/user.dart';
 import 'package:go_for_it/util/constant.dart';
+
+const _userFields = ['id', 'username', 'avatar', 'startDayOfWeek', 'language', 'createdTime'];
 
 ///
 /// 数据库工具
@@ -34,12 +37,54 @@ class DatabaseHelper {
     return db;
   }
 
-
   ///
   /// 创建数据库
   ///
   _onCreate(Database db, int version) async {
-    await db.execute('');
+    await db.execute('''
+    CREATE TABLE User (
+      id int(10) NOT NULL,
+      username varchar(20) NOT NULL DEFAULT 'unnaming',
+      avatar varchar(255) NOT NULL DEFAULT 'unavataring',
+      startDayOfWeek tinyint(3) NOT NULL DEFAULT '6',
+      language tinyint(3) NOT NULL DEFAULT '0',
+      createdTime int(10) NOT NULL,
+      PRIMARY KEY (`id`)
+    );
+    ''');
+    await db.execute('''
+    CREATE TABLE Task (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      type tinyint(3) NOT NULL DEFAULT '0',
+      classification tinyint(4) DEFAULT '0',
+      name varchar(50) NOT NULL,
+      importance tinyint(3) NOT NULL DEFAULT '0',
+      status tinyint(3) NOT NULL DEFAULT '0',
+      startTime int(10) NOT NULL,
+      endTime int(10) NOT NULL,
+      createdTime int(10) NOT NULL
+    );
+    ''');
+    await db.execute('''
+     CREATE TABLE Step (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      Task_id int(10) NOT NULL,
+      createdTime int(10) NOT NULL
+    );
+    ''');
+    await db.execute('''
+    INSERT INTO `User` (id, createdTime) VALUES (0, ${DateTime.now().millisecondsSinceEpoch ~/ 1000});
+    ''');
+  }
+
+  ///
+  /// 查询用户
+  ///
+  Future<User> getUser() async {
+    Database dbClient = await db;
+    return User.fromJson((await dbClient.query('User',
+      columns: _userFields,
+    ))[0]);
   }
 
   ///

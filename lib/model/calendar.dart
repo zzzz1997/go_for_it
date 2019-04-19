@@ -2,10 +2,9 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:go_for_it/ui/view/calendar.dart';
 
 ///
-/// 日历管理
+/// 日历状态管理
 ///
 abstract class CalendarModel extends Model {
-
   // 今天
   DateTime _today;
 
@@ -43,9 +42,9 @@ abstract class CalendarModel extends Model {
   ///
   DateTime initDate() {
     _today =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     _date =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     return _date;
   }
 
@@ -69,7 +68,8 @@ abstract class CalendarModel extends Model {
   ///
   onScroll(offset) {
     _offset = offset;
-    double _midScrollOffset = CalendarParam.lineHeight * (CalendarParam.monthLines - 1);
+    double _midScrollOffset =
+        CalendarParam.lineHeight * (CalendarParam.monthLines - 1);
     bool isWeek = offset >= _midScrollOffset || (_midScrollOffset - offset) < 5;
     if (_isWeek != isWeek) {
       _isWeek = isWeek;

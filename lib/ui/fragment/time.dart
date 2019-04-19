@@ -4,7 +4,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:date_format/date_format.dart';
-import 'package:go_for_it/entity/time_task.dart';
+import 'package:go_for_it/entity/task.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/view/calendar.dart';
 import 'package:go_for_it/ui/view/half_check_box.dart';
@@ -53,7 +53,7 @@ class TimeFragment extends StatelessWidget {
                         height: _rowHeight > 0 ? _rowHeight : 0.0,
                       );
                     }
-                    TimeTask task = model.timeTasks[index];
+                    Task task = model.timeTasks[index];
                     return Material(
                       child: SizedBox(
                         height: _taskHeight,

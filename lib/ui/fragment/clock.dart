@@ -2,8 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_for_it/entity/clock_step.dart';
-import 'package:go_for_it/entity/clock_task.dart';
+import 'package:go_for_it/entity/step.dart';
+import 'package:go_for_it/entity/task.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/view/calendar.dart';
 import 'package:go_for_it/ui/view/clock_progress.dart';
@@ -55,10 +55,10 @@ class ClockFragment extends StatelessWidget {
                     height: _rowHeight > 0 ? _rowHeight : 0.0,
                   );
                 }
-                ClockTask task = model.clockTasks[index];
-                List<ClockStep> steps = model.clockSteps
+                Task task = model.clockTasks[index];
+                var steps = model.steps
                   .where((step) =>
-                step.clockTaskId == task.id).toList();
+                step.taskId == task.id).toList();
                 int length = steps.length;
                 List<int> data = List(length);
                 for (int i = 0; i < length; i++) {

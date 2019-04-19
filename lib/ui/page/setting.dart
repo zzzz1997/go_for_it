@@ -21,12 +21,17 @@ class SettingPage extends StatelessWidget {
             children: <Widget>[
               ListTile(
                 onTap: () {
-                  _onWeekLanguageTap(context);
+                  _showSelectDialog(context, model, Constant.weekLanguage,
+                      Constant.weekLanguage);
                 },
                 title: Text(Constant.weekLanguage),
                 subtitle: Text(Constant.languages[model.user.language]),
               ),
               ListTile(
+                onTap: () {
+                  _showSelectDialog(
+                      context, model, Constant.weekStart, Constant.weekStart);
+                },
                 title: Text(Constant.weekStart),
                 subtitle: Text(model.user.language == 0
                     ? '周${CalendarParam.weekCh[model.user.startDayOfWeek - 1]}'
@@ -40,13 +45,45 @@ class SettingPage extends StatelessWidget {
   }
 
   ///
-  /// 星期语言点击事件
+  /// 选择设置
   ///
-  _onWeekLanguageTap(BuildContext context) {
-
-  }
-
-  _showSelectDialog() {
-
+  _showSelectDialog(BuildContext context, MainStateModel model, String setting,
+      String title) {
+    int length = setting == Constant.weekLanguage
+        ? Constant.languages.length
+        : CalendarParam.weekCh.length;
+    List<RadioListTile> _radioListTiles = List(length);
+    for (int i = 0; i < length; i++) {
+      _radioListTiles[i] = RadioListTile(
+        value: i,
+        title: Text(setting == Constant.weekLanguage
+            ? Constant.languages[i]
+            : model.user.language == 0
+                ? '周${CalendarParam.weekCh[i]}'
+                : CalendarParam.weekEn[i]),
+        groupValue: setting == Constant.weekLanguage
+            ? model.user.language
+            : model.user.startDayOfWeek - 1,
+        onChanged: (value) async {
+          try {
+            await model.setSelectSetting(setting, value);
+          } catch (e) {
+            // todo alert
+          }
+          Navigator.pop(context);
+        },
+      );
+    }
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: _radioListTiles,
+            ),
+          );
+        });
   }
 }

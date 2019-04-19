@@ -6,7 +6,7 @@ class Constant {
 
   static final unknownArea = '未知领域';
 
-  static final dbName = 'go_for_it';
+  static final dbName = 'goforit';
 
   static final width = 1080;
   static final height = 1920;

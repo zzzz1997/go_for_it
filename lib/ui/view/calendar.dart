@@ -49,7 +49,7 @@ class Calendar extends StatelessWidget {
     @required this.onDateChange,
     @required this.onSwiperIndexChange,
     @required this.onScroll,
-  })  : assert(startDayOfWeek >= 0 && startDayOfWeek <= 7),
+  })  : assert(startDayOfWeek >= 1 && startDayOfWeek <= 7),
         assert(swiperIndex >= 0 && swiperIndex <= 2),
         assert(onDateChange != null),
         assert(onSwiperIndexChange != null),
