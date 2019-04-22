@@ -82,13 +82,15 @@ class _ClockProgressPainter extends CustomPainter {
     // 绘制背景
     canvas.drawRect(
         Rect.fromLTRB(0.0, 0.0, size.width, size.height), backPaint);
-    // 绘制前景
-    data.forEach((d) {
-      canvas.drawRect(
-          Rect.fromLTRB(size.width * d / total, 0.0,
-              size.width * (d + 1) / total, size.height),
-          frontPaint);
-    });
+    if (total > 0) {
+      // 绘制前景
+      data.forEach((d) {
+        canvas.drawRect(
+            Rect.fromLTRB(size.width * d / total, 0.0,
+                size.width * (d + 1) / total, size.height),
+            frontPaint);
+      });
+    }
   }
 
   @override

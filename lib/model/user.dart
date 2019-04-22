@@ -1,5 +1,6 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'package:go_for_it/entity/user.dart';
+import 'package:go_for_it/service/user.dart';
 import 'package:go_for_it/util/constant.dart';
 import 'package:go_for_it/util/database_helper.dart';
 
@@ -8,7 +9,7 @@ import 'package:go_for_it/util/database_helper.dart';
 ///
 abstract class UserModel extends Model {
   // 用户
-  User _user = User(0, '', '', 6, 0, 0);
+  User _user = User(0, '', '', 6, 0, '', 0, 0);
 
   // 获取用户
   User get user => _user;
@@ -34,5 +35,17 @@ abstract class UserModel extends Model {
     }
     notifyListeners();
     return null;
+  }
+
+  ///
+  /// 用户登录或注册
+  ///
+  Future<void> loginOrRegister(username, password, isLogin) async {
+    try {
+      _user = await UserService.loginOrRegister(username, password, isLogin);
+      notifyListeners();
+    } catch (e) {
+      throw e;
+    }
   }
 }

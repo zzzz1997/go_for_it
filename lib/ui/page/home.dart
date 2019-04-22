@@ -8,6 +8,7 @@ import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/fragment/clock.dart';
 import 'package:go_for_it/ui/fragment/time.dart';
 import 'package:go_for_it/ui/fragment/todo.dart';
+import 'package:go_for_it/ui/page/login.dart';
 import 'package:go_for_it/ui/page/setting.dart';
 import 'package:go_for_it/util/constant.dart';
 import 'package:go_for_it/util/transition.dart';
@@ -72,12 +73,22 @@ class HomePage extends StatelessWidget {
         drawer: Drawer(
           child: ListView(
             children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountName: Text(model.user.username),
-                accountEmail: Text(Constant.appTag),
-                currentAccountPicture: CircleAvatar(
-                    backgroundImage: CachedNetworkImageProvider(
-                        'https://res2.webinn.online/assets/avatar/animal3.png')),
+              GestureDetector(
+                onTap: () {
+                  _onUserTop(context, model);
+                },
+                child: UserAccountsDrawerHeader(
+                  currentAccountPicture: model.user.id > 0
+                      ? CircleAvatar(
+                          backgroundImage: CachedNetworkImageProvider(
+                              'https://res2.webinn.online/assets/avatar/animal3.png'),
+                        )
+                      : SvgPicture.asset(Constant.defaultAvatarSVG),
+                  accountName: Text(model.user.id > 0
+                      ? model.user.username
+                      : Constant.loginOrRegister),
+                  accountEmail: Text(Constant.appTag),
+                ),
               ),
               ClipRect(
                   child: Column(
@@ -147,6 +158,19 @@ class HomePage extends StatelessWidget {
   _onBarTap(MainStateModel model, int index) {
     _swiperController.move(index);
     model.changePage(index);
+  }
+
+  ///
+  /// 点击用户信息
+  ///
+  _onUserTop(BuildContext context, MainStateModel model) {
+    if (model.user.id == 0) {
+      Transition.navigatorPush(
+          context, LoginPage(), TransitionType.inFromRight);
+    } else {
+      Transition.navigatorPush(
+          context, SettingPage(), TransitionType.inFromRight);
+    }
   }
 
   ///

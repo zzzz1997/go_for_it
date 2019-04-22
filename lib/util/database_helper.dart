@@ -48,6 +48,8 @@ class DatabaseHelper {
       avatar varchar(255) NOT NULL DEFAULT 'unavataring',
       startDayOfWeek tinyint(3) NOT NULL DEFAULT '6',
       language tinyint(3) NOT NULL DEFAULT '0',
+      token varchar(255) NOT NULL DEFAULT '',
+      tokenTime int(10) NOT NULL DEFAULT 0,
       createdTime int(10) NOT NULL,
       PRIMARY KEY (`id`)
     );
