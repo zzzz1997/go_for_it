@@ -3,7 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:go_for_it/entity/user.dart';
 import 'package:go_for_it/util/constant.dart';
 
-const _userFields = ['id', 'username', 'avatar', 'startDayOfWeek', 'language', 'createdTime'];
+const _userFields = ['id', 'username', 'avatar', 'startDayOfWeek', 'language', 'token', 'tokenTime', 'createdTime'];
 
 ///
 /// 数据库工具
@@ -46,8 +46,8 @@ class DatabaseHelper {
       id int(10) NOT NULL,
       username varchar(20) NOT NULL DEFAULT 'unnaming',
       avatar varchar(255) NOT NULL DEFAULT 'unavataring',
-      startDayOfWeek tinyint(3) NOT NULL DEFAULT '6',
       language tinyint(3) NOT NULL DEFAULT '0',
+      startDayOfWeek tinyint(3) NOT NULL DEFAULT '6',
       token varchar(255) NOT NULL DEFAULT '',
       tokenTime int(10) NOT NULL DEFAULT 0,
       createdTime int(10) NOT NULL,
@@ -71,6 +71,7 @@ class DatabaseHelper {
      CREATE TABLE Step (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       Task_id int(10) NOT NULL,
+      targetTime int(10) NOT NULL,
       createdTime int(10) NOT NULL
     );
     ''');
@@ -87,6 +88,14 @@ class DatabaseHelper {
     return User.fromJson((await dbClient.query('User',
       columns: _userFields,
     ))[0]);
+  }
+
+  ///
+  /// 更新用户信息
+  ///
+  Future<int> updateUser(User user) async {
+    Database dbClient = await db;
+    return await dbClient.update('User', user.toJson());
   }
 
   ///

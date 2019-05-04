@@ -18,7 +18,7 @@ class Transition {
   ///
   /// 跳转界面
   ///
-  static navigatorPush(
+  static push(
       BuildContext context, Widget page, TransitionType transitionType) {
     Navigator.push(
         context,
@@ -28,6 +28,22 @@ class Transition {
             },
             transitionsBuilder:
                 Transition.standardTransitionsBuilder(transitionType)));
+  }
+
+  ///
+  /// 跳转并删除其它栈
+  ///
+  static pushAndRemoveUntil(
+      BuildContext context, Widget page, TransitionType transitionType) {
+    Navigator.pushAndRemoveUntil(
+        context,
+        PageRouteBuilder(
+            pageBuilder: (BuildContext context, _, __) {
+              return page;
+            },
+            transitionsBuilder:
+                Transition.standardTransitionsBuilder(transitionType)),
+        (route) => false);
   }
 
   ///

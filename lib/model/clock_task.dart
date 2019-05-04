@@ -48,6 +48,9 @@ abstract class ClockTaskModel extends Model {
         i,
         index,
         random.nextInt(
+            _clockTasks[index].endTime - _clockTasks[index].startTime) +
+            _clockTasks[index].startTime,
+        random.nextInt(
                 _clockTasks[index].endTime - _clockTasks[index].startTime) +
             _clockTasks[index].startTime,
       );

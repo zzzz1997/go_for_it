@@ -10,14 +10,15 @@ class User {
   int id;
   String username;
   String avatar;
-  int startDayOfWeek;
   int language;
+  int startDayOfWeek;
   String token;
   int tokenTime;
+  bool isLogin;
   int createdTime;
 
-  User(this.id, this.username, this.avatar, this.startDayOfWeek, this.language,
-      this.token, this.tokenTime, this.createdTime);
+  User(this.id, this.username, this.avatar, this.language, this.startDayOfWeek,
+      this.token, this.tokenTime, this.isLogin, this.createdTime);
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 

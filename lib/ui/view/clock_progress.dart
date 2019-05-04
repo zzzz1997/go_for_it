@@ -45,7 +45,8 @@ class ClockProgress extends StatelessWidget {
             backColor: backColor,
             total: total,
             data: data,
-          )),
+          ),
+      ),
     );
   }
 }

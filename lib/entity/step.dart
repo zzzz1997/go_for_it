@@ -9,9 +9,10 @@ part 'step.g.dart';
 class Step {
   int id;
   int taskId;
+  int targetTime;
   int createdTime;
 
-  Step(this.id, this.taskId, this.createdTime);
+  Step(this.id, this.taskId, this.targetTime, this.createdTime);
 
   factory Step.fromJson(Map<String, dynamic> json) =>
       _$StepFromJson(json);

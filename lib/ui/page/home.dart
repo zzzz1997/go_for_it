@@ -10,6 +10,7 @@ import 'package:go_for_it/ui/fragment/time.dart';
 import 'package:go_for_it/ui/fragment/todo.dart';
 import 'package:go_for_it/ui/page/login.dart';
 import 'package:go_for_it/ui/page/setting.dart';
+import 'package:go_for_it/ui/page/user.dart';
 import 'package:go_for_it/util/constant.dart';
 import 'package:go_for_it/util/transition.dart';
 
@@ -78,13 +79,14 @@ class HomePage extends StatelessWidget {
                   _onUserTop(context, model);
                 },
                 child: UserAccountsDrawerHeader(
-                  currentAccountPicture: model.user.id > 0
+                  currentAccountPicture: model.user.isLogin
                       ? CircleAvatar(
-                          backgroundImage: CachedNetworkImageProvider(
-                              'https://res2.webinn.online/assets/avatar/animal3.png'),
+                          backgroundImage: model.user.isLogin
+                              ? CachedNetworkImageProvider(model.user.avatar)
+                              : SvgPicture.asset(Constant.defaultAvatarSVG),
                         )
                       : SvgPicture.asset(Constant.defaultAvatarSVG),
-                  accountName: Text(model.user.id > 0
+                  accountName: Text(model.user.isLogin
                       ? model.user.username
                       : Constant.loginOrRegister),
                   accountEmail: Text(Constant.appTag),
@@ -102,8 +104,8 @@ class HomePage extends StatelessWidget {
                   ),
                   ListTile(
                     onTap: null,
-                    leading: Icon(Icons.exit_to_app),
-                    title: Text('退出登录'),
+                    leading: Icon(Icons.error_outline),
+                    title: Text('关于'),
                   )
                 ],
               ))
@@ -164,12 +166,12 @@ class HomePage extends StatelessWidget {
   /// 点击用户信息
   ///
   _onUserTop(BuildContext context, MainStateModel model) {
-    if (model.user.id == 0) {
-      Transition.navigatorPush(
-          context, LoginPage(), TransitionType.inFromRight);
+    if (model.user.isLogin) {
+      Transition.push(
+          context, UserPage(), TransitionType.inFromRight);
     } else {
-      Transition.navigatorPush(
-          context, SettingPage(), TransitionType.inFromRight);
+      Transition.push(
+          context, LoginPage(), TransitionType.inFromRight);
     }
   }
 
@@ -177,7 +179,7 @@ class HomePage extends StatelessWidget {
   /// 点击设置
   ///
   _onSettingTap(context) {
-    Transition.navigatorPush(
+    Transition.push(
         context, SettingPage(), TransitionType.inFromRight);
   }
 }

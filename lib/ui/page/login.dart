@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:go_for_it/model/main.dart';
+import 'package:go_for_it/ui/page/home.dart';
 import 'package:go_for_it/ui/view/password_field.dart';
 import 'package:go_for_it/util/alert.dart';
 import 'package:go_for_it/util/constant.dart';
+import 'package:go_for_it/util/transition.dart';
 
 ///
 /// 登录页面
@@ -174,11 +176,10 @@ class _LoginStateState extends State<LoginPage> {
     } else {
       try {
         await model.loginOrRegister(username, password1, _isLogin);
-        Future.delayed(Duration(seconds: 0),
-                () => Navigator.of(context).pushReplacementNamed('/home'));
+        Transition.pushAndRemoveUntil(
+            context, HomePage(), TransitionType.inFromBottom);
       } catch (e) {
         _autoValidate = true;
-        print(e);
         Alert.errorBar(context, e.toString() ?? 'error');
       }
     }

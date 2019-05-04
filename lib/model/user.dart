@@ -9,7 +9,7 @@ import 'package:go_for_it/util/database_helper.dart';
 ///
 abstract class UserModel extends Model {
   // 用户
-  User _user = User(0, '', '', 6, 0, '', 0, 0);
+  User _user = User(0, '', '', 0, 6, '', 0, false, 0);
 
   // 获取用户
   User get user => _user;
@@ -21,6 +21,10 @@ abstract class UserModel extends Model {
   ///
   initUser() async {
     _user = await DatabaseHelper().getUser();
+    print(_user.toJson());
+    if (DateTime.now().millisecondsSinceEpoch ~/ 1000 < _user.tokenTime) {
+      _user.isLogin = true;
+    }
     notifyListeners();
   }
 
@@ -33,6 +37,10 @@ abstract class UserModel extends Model {
     } else {
       _user.startDayOfWeek = value + 1;
     }
+    DatabaseHelper().updateUser(_user);
+    if (_user.isLogin) {
+      UserService.set(_user);
+    }
     notifyListeners();
     return null;
   }
@@ -43,7 +51,22 @@ abstract class UserModel extends Model {
   Future<void> loginOrRegister(username, password, isLogin) async {
     try {
       _user = await UserService.loginOrRegister(username, password, isLogin);
+      await DatabaseHelper().updateUser(_user);
+      _user.isLogin = true;
       notifyListeners();
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  ///
+  /// 退出登录
+  ///
+  Future<void> exitLogin() async {
+    _user.tokenTime = 0;
+    _user.isLogin = false;
+    try {
+      await DatabaseHelper().updateUser(_user);
     } catch (e) {
       throw e;
     }

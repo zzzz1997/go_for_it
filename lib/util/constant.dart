@@ -43,4 +43,5 @@ class Constant {
   static final pleaseCheckInput = '请检查输入';
   static final passwordLengthNotEnough = '密码应不小于6位';
   static final passwordNotEqual = '两次密码不相同';
+  static final exitLogin = '退出登录';
 }

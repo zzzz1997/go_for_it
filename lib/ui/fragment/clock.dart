@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_for_it/entity/step.dart';
 import 'package:go_for_it/entity/task.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/view/calendar.dart';
