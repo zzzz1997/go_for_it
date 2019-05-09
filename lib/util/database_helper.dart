@@ -3,7 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:go_for_it/entity/user.dart';
 import 'package:go_for_it/util/constant.dart';
 
-const _userFields = ['id', 'username', 'avatar', 'startDayOfWeek', 'language', 'token', 'tokenTime', 'createdTime'];
+const _userFields = ['id', 'username', 'avatar', 'language', 'startDayOfWeek', 'checkMode', 'token', 'tokenTime', 'createdTime'];
 
 ///
 /// 数据库工具
@@ -48,6 +48,7 @@ class DatabaseHelper {
       avatar varchar(255) NOT NULL DEFAULT 'unavataring',
       language tinyint(3) NOT NULL DEFAULT '0',
       startDayOfWeek tinyint(3) NOT NULL DEFAULT '6',
+      checkMode tinyint(3) NOT NULL DEFAULT '0',
       token varchar(255) NOT NULL DEFAULT '',
       tokenTime int(10) NOT NULL DEFAULT 0,
       createdTime int(10) NOT NULL,

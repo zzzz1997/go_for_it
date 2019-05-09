@@ -12,6 +12,7 @@ import 'package:go_for_it/ui/page/login.dart';
 import 'package:go_for_it/ui/page/setting.dart';
 import 'package:go_for_it/ui/page/user.dart';
 import 'package:go_for_it/util/constant.dart';
+import 'package:go_for_it/util/modal.dart';
 import 'package:go_for_it/util/transition.dart';
 
 ///
@@ -38,6 +39,7 @@ class HomePage extends StatelessWidget {
         ));
       }
       return Scaffold(
+        resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: Text('${model.date.month}/${model.date.day}'),
           actions: <Widget>[
@@ -114,7 +116,9 @@ class HomePage extends StatelessWidget {
           semanticLabel: 'hhh',
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: null,
+          onPressed: () {
+            _showAddModal(context, model);
+          },
           backgroundColor: model.themeData.primaryColor,
           child: Icon(Icons.add),
         ),
@@ -160,6 +164,13 @@ class HomePage extends StatelessWidget {
   _onBarTap(MainStateModel model, int index) {
     _swiperController.move(index);
     model.changePage(index);
+  }
+
+  ///
+  /// 显示新建模态框
+  ///
+  _showAddModal(BuildContext context, MainStateModel model) {
+    ModalUtil.showTaskModal(context, null, model.currentIndex == 0 ? 1 : 0);
   }
 
   ///

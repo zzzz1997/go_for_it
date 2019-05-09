@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
 
 ///
-/// 半选选择框状态枚举
-///
-enum HalfCheckBoxStatus {
-  UNCHECKED,
-  HALF_CHECKED,
-  CHECKED,
-}
-
-///
 /// 半选选择框
 ///
 class HalfCheckBox extends StatelessWidget {
+
+  HalfCheckBox({@required this.status, @required this.color, @required this.onPressed});
+
   // 状态
-  final HalfCheckBoxStatus status;
+  final int status;
 
   // 颜色
   final Color color;
@@ -22,30 +16,28 @@ class HalfCheckBox extends StatelessWidget {
   // 点击事件
   final Function onPressed;
 
-  HalfCheckBox({@required this.status, this.color, this.onPressed});
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
       icon: Icon(_icon(status)),
       onPressed: onPressed,
-      color: status == HalfCheckBoxStatus.CHECKED ? Colors.grey : color,
+      color: status == 2 ? Colors.grey : color,
     );
   }
 
   ///
   /// 获取图标
   ///
-  IconData _icon(HalfCheckBoxStatus status) {
+  IconData _icon(int status) {
     IconData iconData;
     switch (status) {
-      case HalfCheckBoxStatus.UNCHECKED:
+      case 0:
         iconData = Icons.radio_button_unchecked;
         break;
-      case HalfCheckBoxStatus.HALF_CHECKED:
+      case 1:
         iconData = Icons.check_circle_outline;
         break;
-      case HalfCheckBoxStatus.CHECKED:
+      case 2:
         iconData = Icons.check_circle_outline;
         break;
     }

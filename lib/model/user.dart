@@ -9,7 +9,7 @@ import 'package:go_for_it/util/database_helper.dart';
 ///
 abstract class UserModel extends Model {
   // 用户
-  User _user = User(0, '', '', 0, 6, '', 0, false, 0);
+  User _user = User(0, '', '', 0, 6, 0, '', 0, false, 0);
 
   // 获取用户
   User get user => _user;
@@ -32,10 +32,18 @@ abstract class UserModel extends Model {
   /// 设置选择设置
   ///
   Future<void> setSelectSetting(setting, value) {
-    if (setting == Constant.weekLanguage) {
-      _user.language = value;
-    } else {
-      _user.startDayOfWeek = value + 1;
+    switch (setting) {
+      case Constant.weekLanguage:
+        _user.language = value;
+        break;
+      case Constant.weekStart:
+        _user.startDayOfWeek = value + 1;
+        break;
+      case Constant.checkMode:
+        _user.checkMode = value;
+        break;
+      default:
+        break;
     }
     DatabaseHelper().updateUser(_user);
     if (_user.isLogin) {

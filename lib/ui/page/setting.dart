@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/view/calendar.dart';
+import 'package:go_for_it/util/alert.dart';
 import 'package:go_for_it/util/constant.dart';
 
 ///
@@ -36,7 +37,15 @@ class SettingPage extends StatelessWidget {
                 subtitle: Text(model.user.language == 0
                     ? '周${CalendarParam.weekCh[model.user.startDayOfWeek - 1]}'
                     : CalendarParam.weekEn[model.user.startDayOfWeek - 1]),
-              )
+              ),
+              ListTile(
+                onTap: () {
+                  _showSelectDialog(
+                      context, model, Constant.checkMode, Constant.checkMode);
+                },
+                title: Text(Constant.checkMode),
+                subtitle: Text(Constant.checkModes[model.user.checkMode]),
+              ),
             ],
           ),
         );
@@ -51,24 +60,30 @@ class SettingPage extends StatelessWidget {
       String title) {
     int length = setting == Constant.weekLanguage
         ? Constant.languages.length
-        : CalendarParam.weekCh.length;
+        : setting == Constant.weekStart
+            ? CalendarParam.weekCh.length
+            : Constant.checkModes.length;
     List<RadioListTile> _radioListTiles = List(length);
     for (int i = 0; i < length; i++) {
       _radioListTiles[i] = RadioListTile(
         value: i,
         title: Text(setting == Constant.weekLanguage
             ? Constant.languages[i]
-            : model.user.language == 0
-                ? '周${CalendarParam.weekCh[i]}'
-                : CalendarParam.weekEn[i]),
+            : setting == Constant.weekStart
+                ? model.user.language == 0
+                    ? '周${CalendarParam.weekCh[i]}'
+                    : CalendarParam.weekEn[i]
+                : Constant.checkModes[i]),
         groupValue: setting == Constant.weekLanguage
             ? model.user.language
-            : model.user.startDayOfWeek - 1,
+            : setting == Constant.weekStart
+                ? model.user.startDayOfWeek - 1
+                : model.user.checkMode,
         onChanged: (value) async {
           try {
             await model.setSelectSetting(setting, value);
           } catch (e) {
-            // todo alert
+            Alert.errorBar(context, e.toString() ?? 'error');
           }
           Navigator.pop(context);
         },

@@ -13,6 +13,7 @@ User _$UserFromJson(Map<String, dynamic> json) {
       json['avatar'] as String,
       json['language'] as int,
       json['startDayOfWeek'] as int,
+      json['checkMode'] as int,
       json['token'] as String,
       json['tokenTime'] as int,
       false,
@@ -25,6 +26,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'avatar': instance.avatar,
       'language': instance.language,
       'startDayOfWeek': instance.startDayOfWeek,
+      'checkMode': instance.checkMode,
       'token': instance.token,
       'tokenTime': instance.tokenTime,
       'createdTime': instance.createdTime

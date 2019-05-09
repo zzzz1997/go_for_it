@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:go_for_it/model/calendar.dart';
-import 'package:go_for_it/model/clock_task.dart';
-import 'package:go_for_it/model/time_task.dart';
+import 'package:go_for_it/model/task.dart';
 import 'package:go_for_it/model/user.dart';
 
 ///
 /// 主状态管理
 ///
 class MainStateModel extends Model
-    with CalendarModel, ClockTaskModel, TimeTaskModel, UserModel {
+    with CalendarModel, TaskModel, UserModel {
   // 定义主题
   ThemeData _themeData;
 
@@ -19,7 +18,7 @@ class MainStateModel extends Model
   // 当前位置
   int _currentIndex = 0;
 
-  // 获取当前未知
+  // 获取当前位置
   int get currentIndex => _currentIndex;
 
   MainStateModel(context) {

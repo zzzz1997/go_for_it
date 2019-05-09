@@ -29,6 +29,7 @@ class UserService {
       await Api.post('/user/set', data: {
         'language': user.language,
         'startDayOfWeek': user.startDayOfWeek,
+        'checkMode': user.checkMode,
       }, token: user.token);
       return true;
     } catch (e) {
