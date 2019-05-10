@@ -2,6 +2,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 
+///
+/// 日历参数
+///
 class CalendarParam {
   // 中文星期
   static final weekCh = ['一', '二', '三', '四', '五', '六', '日'];

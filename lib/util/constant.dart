@@ -51,4 +51,6 @@ class Constant {
   static const editTask = '编辑任务';
 
   static const taskImportance = ['无', '低', '中', '高'];
+
+  static const selectTimeError = '选择时间有误';
 }

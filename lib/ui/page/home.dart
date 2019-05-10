@@ -11,6 +11,7 @@ import 'package:go_for_it/ui/fragment/todo.dart';
 import 'package:go_for_it/ui/page/login.dart';
 import 'package:go_for_it/ui/page/setting.dart';
 import 'package:go_for_it/ui/page/user.dart';
+import 'package:go_for_it/ui/view/date_picker.dart';
 import 'package:go_for_it/util/constant.dart';
 import 'package:go_for_it/util/modal.dart';
 import 'package:go_for_it/util/transition.dart';
@@ -169,8 +170,16 @@ class HomePage extends StatelessWidget {
   ///
   /// 显示新建模态框
   ///
-  _showAddModal(BuildContext context, MainStateModel model) {
-    ModalUtil.showTaskModal(context, null, model.currentIndex == 0 ? 1 : 0);
+  _showAddModal(BuildContext context, MainStateModel model) async {
+    // ModalUtil.showTaskModal(context, null, model.currentIndex == 0 ? 1 : 0);
+    print(await DatePicker.showPicker(
+        context,
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
+            .add(Duration(days: 3)),
+        DatePickerSelectMode.RANGE,
+        model.user.language,
+        model.user.startDayOfWeek));
   }
 
   ///
@@ -178,11 +187,9 @@ class HomePage extends StatelessWidget {
   ///
   _onUserTop(BuildContext context, MainStateModel model) {
     if (model.user.isLogin) {
-      Transition.push(
-          context, UserPage(), TransitionType.inFromRight);
+      Transition.push(context, UserPage(), TransitionType.inFromRight);
     } else {
-      Transition.push(
-          context, LoginPage(), TransitionType.inFromRight);
+      Transition.push(context, LoginPage(), TransitionType.inFromRight);
     }
   }
 
@@ -190,7 +197,6 @@ class HomePage extends StatelessWidget {
   /// 点击设置
   ///
   _onSettingTap(context) {
-    Transition.push(
-        context, SettingPage(), TransitionType.inFromRight);
+    Transition.push(context, SettingPage(), TransitionType.inFromRight);
   }
 }
