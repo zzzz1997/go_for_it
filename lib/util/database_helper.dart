@@ -61,6 +61,7 @@ class DatabaseHelper {
       type tinyint(3) NOT NULL DEFAULT '0',
       classification tinyint(4) DEFAULT '0',
       name varchar(50) NOT NULL,
+      description varchar(255) NOT NULL,
       importance tinyint(3) NOT NULL DEFAULT '0',
       status tinyint(3) NOT NULL DEFAULT '0',
       startTime int(10) NOT NULL,

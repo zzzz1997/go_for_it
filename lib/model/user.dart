@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:go_for_it/entity/user.dart';
 import 'package:go_for_it/service/user.dart';
+import 'package:go_for_it/util/alert.dart';
 import 'package:go_for_it/util/constant.dart';
 import 'package:go_for_it/util/database_helper.dart';
 
@@ -31,7 +35,7 @@ abstract class UserModel extends Model {
   ///
   /// 设置选择设置
   ///
-  Future<void> setSelectSetting(setting, value) {
+  Future<void> setSelectSetting(setting, value, connectivityResult) {
     switch (setting) {
       case Constant.weekLanguage:
         _user.language = value;
@@ -46,8 +50,8 @@ abstract class UserModel extends Model {
         break;
     }
     DatabaseHelper().updateUser(_user);
-    if (_user.isLogin) {
-      UserService.set(_user);
+    if (user.isLogin && connectivityResult != ConnectivityResult.none) {
+      UserService.set(user);
     }
     notifyListeners();
     return null;
@@ -59,11 +63,27 @@ abstract class UserModel extends Model {
   Future<void> loginOrRegister(username, password, isLogin) async {
     try {
       _user = await UserService.loginOrRegister(username, password, isLogin);
-      await DatabaseHelper().updateUser(_user);
+      await DatabaseHelper().updateUser(user);
       _user.isLogin = true;
       notifyListeners();
     } catch (e) {
       throw e;
+    }
+  }
+
+  ///
+  /// 更换头像
+  ///
+  Future<void> changeAvatar() async {
+    try {
+      File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      String avatar = await UserService.avatar(user, image);
+      _user.avatar = avatar;
+      await DatabaseHelper().updateUser(user);
+      Alert.toast(Constant.changeAvatarSuccess);
+      notifyListeners();
+    } catch (e) {
+      Alert.toast(Constant.changeAvatarFail);
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/page/home.dart';
 import 'package:go_for_it/ui/view/password_field.dart';
@@ -139,7 +140,7 @@ class _LoginStateState extends State<LoginPage> {
                         child: Text(_isLogin ? Constant.login : Constant.register,
                             style: TextStyle(color: Colors.white)),
                         color: model.themeData.primaryColor,
-                        // shape: const StadiumBorder(),
+                        shape: const StadiumBorder(),
                       ),
                       SizedBox(
                         width: 20.0,
@@ -174,13 +175,17 @@ class _LoginStateState extends State<LoginPage> {
       _autoValidate = true;
       Alert.errorBar(context, Constant.pleaseCheckInput);
     } else {
-      try {
-        await model.loginOrRegister(username, password1, _isLogin);
-        Transition.pushAndRemoveUntil(
-            context, HomePage(), TransitionType.inFromBottom);
-      } catch (e) {
-        _autoValidate = true;
-        Alert.errorBar(context, e.toString() ?? 'error');
+      if (model.connectivityResult == ConnectivityResult.none) {
+        Alert.toast(Constant.noneConnectivity);
+      } else {
+        try {
+          await model.loginOrRegister(username, password1, _isLogin);
+          Transition.pushAndRemoveUntil(
+              context, HomePage(), TransitionType.inFromBottom);
+        } catch (e) {
+          _autoValidate = true;
+          Alert.errorBar(context, e.toString() ?? 'error');
+        }
       }
     }
   }

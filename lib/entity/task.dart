@@ -11,13 +11,14 @@ class Task {
   int type;
   int classification;
   String name;
+  String description;
   int importance;
   int status;
   int startTime;
   int endTime;
   int createdTime;
 
-  Task(this.id, this.type, this.classification, this.name, this.importance,
+  Task(this.id, this.type, this.classification, this.name, this.description, this.importance,
       this.status, this.startTime, this.endTime, this.createdTime);
 
   factory Task.fromJson(Map<String, dynamic> json) =>

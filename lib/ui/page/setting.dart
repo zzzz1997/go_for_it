@@ -81,7 +81,7 @@ class SettingPage extends StatelessWidget {
                 : model.user.checkMode,
         onChanged: (value) async {
           try {
-            await model.setSelectSetting(setting, value);
+            await model.setSelectSetting(setting, value, model.connectivityResult);
           } catch (e) {
             Alert.errorBar(context, e.toString() ?? 'error');
           }

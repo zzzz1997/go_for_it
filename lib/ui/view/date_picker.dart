@@ -190,8 +190,8 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
 
     DateTime now = DateTime.now();
     _today = DateTime(now.year, now.month, now.day);
-    _index = _today.year * _monthLength +
-        _today.month -
+    _index = _startTime.year * _monthLength +
+        _startTime.month -
         _firstDate.year * _monthLength -
         _firstDate.month;
 

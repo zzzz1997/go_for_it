@@ -40,9 +40,10 @@ abstract class TaskModel extends Model {
           0,
           0,
           '${dateTime.day}日的任务$i',
+          '',
           random.nextInt(4),
           random.nextInt(3),
-          dateTime.millisecondsSinceEpoch + random.nextInt(86400000),
+          dateTime.millisecondsSinceEpoch ~/ 1000 + random.nextInt(86400),
           0,
           0);
     }
@@ -62,6 +63,7 @@ abstract class TaskModel extends Model {
           1,
           random.nextInt(2),
           '打卡任务$i',
+          '',
           random.nextInt(4),
           random.nextInt(3),
           startTime,

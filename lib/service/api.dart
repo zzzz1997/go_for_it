@@ -11,7 +11,7 @@ class Api {
   static Dio _dio;
 
   // 基础url
-  static final baseUrl = 'http://113.55.52.237:8080';
+  static final baseUrl = 'http://113.55.59.156:8080';
 
   ///
   /// 获取单例dio

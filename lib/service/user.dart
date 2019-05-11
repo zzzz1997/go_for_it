@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:go_for_it/entity/user.dart';
 import 'package:go_for_it/service/api.dart';
 
@@ -16,6 +18,19 @@ class UserService {
         'password': password,
       });
       return User.fromJson(_data);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  ///
+  /// 上传头像
+  ///
+  static Future<String> avatar(User user, File avatar) async {
+    try {
+      return await Api.post('/user/avatar', data: {
+        'avatar': UploadFileInfo(avatar, '1.png')
+      }, token: user.token);
     } catch (e) {
       throw e;
     }

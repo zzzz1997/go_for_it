@@ -8,10 +8,10 @@ import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/fragment/clock.dart';
 import 'package:go_for_it/ui/fragment/time.dart';
 import 'package:go_for_it/ui/fragment/todo.dart';
+import 'package:go_for_it/ui/page/backup.dart';
 import 'package:go_for_it/ui/page/login.dart';
 import 'package:go_for_it/ui/page/setting.dart';
 import 'package:go_for_it/ui/page/user.dart';
-import 'package:go_for_it/ui/view/date_picker.dart';
 import 'package:go_for_it/util/constant.dart';
 import 'package:go_for_it/util/modal.dart';
 import 'package:go_for_it/util/transition.dart';
@@ -106,9 +106,16 @@ class HomePage extends StatelessWidget {
                     title: Text(Constant.setting),
                   ),
                   ListTile(
+                    onTap: () {
+                      _onBackupAndRecoveryTap(context, model);
+                    },
+                    leading: Icon(Icons.cloud_queue),
+                    title: Text(Constant.backupAndRecovery),
+                  ),
+                  ListTile(
                     onTap: null,
                     leading: Icon(Icons.error_outline),
-                    title: Text('关于'),
+                    title: Text(Constant.about),
                   )
                 ],
               ))
@@ -170,20 +177,12 @@ class HomePage extends StatelessWidget {
   ///
   /// 显示新建模态框
   ///
-  _showAddModal(BuildContext context, MainStateModel model) async {
-    // ModalUtil.showTaskModal(context, null, model.currentIndex == 0 ? 1 : 0);
-    print(await DatePicker.showPicker(
-        context,
-        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
-        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
-            .add(Duration(days: 3)),
-        DatePickerSelectMode.RANGE,
-        model.user.language,
-        model.user.startDayOfWeek));
+  _showAddModal(BuildContext context, MainStateModel model) {
+    ModalUtil.showTaskModal(context, null, model.currentIndex == 0 ? 1 : 0);
   }
 
   ///
-  /// 点击用户信息
+  /// 用户信息按钮点击事件
   ///
   _onUserTop(BuildContext context, MainStateModel model) {
     if (model.user.isLogin) {
@@ -194,9 +193,20 @@ class HomePage extends StatelessWidget {
   }
 
   ///
-  /// 点击设置
+  /// 设置按钮点击事件
   ///
-  _onSettingTap(context) {
+  _onSettingTap(BuildContext context) {
     Transition.push(context, SettingPage(), TransitionType.inFromRight);
+  }
+
+  ///
+  /// 备份与恢复按钮点击事件
+  ///
+  _onBackupAndRecoveryTap(BuildContext context, MainStateModel model) {
+    if (model.user.isLogin) {
+      Transition.push(context, BackupPage(), TransitionType.inFromRight);
+    } else {
+      Transition.push(context, LoginPage(), TransitionType.inFromRight);
+    }
   }
 }
