@@ -12,6 +12,7 @@ import 'package:go_for_it/ui/page/backup.dart';
 import 'package:go_for_it/ui/page/login.dart';
 import 'package:go_for_it/ui/page/setting.dart';
 import 'package:go_for_it/ui/page/user.dart';
+import 'package:go_for_it/util/alert.dart';
 import 'package:go_for_it/util/constant.dart';
 import 'package:go_for_it/util/modal.dart';
 import 'package:go_for_it/util/transition.dart';
@@ -113,7 +114,9 @@ class HomePage extends StatelessWidget {
                     title: Text(Constant.backupAndRecovery),
                   ),
                   ListTile(
-                    onTap: null,
+                    onTap: () {
+                      _onAboutTap(context);
+                    },
                     leading: Icon(Icons.error_outline),
                     title: Text(Constant.about),
                   )
@@ -208,5 +211,12 @@ class HomePage extends StatelessWidget {
     } else {
       Transition.push(context, LoginPage(), TransitionType.inFromRight);
     }
+  }
+
+  ///
+  /// 关于按钮点击事件
+  ///
+  _onAboutTap(BuildContext context) {
+    Alert.showAbout(context);
   }
 }

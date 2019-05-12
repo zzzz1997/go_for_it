@@ -41,17 +41,17 @@ class MainStateModel extends Model
         primaryColor: Colors.blueAccent, accentColor: Colors.cyanAccent);
     _connectivityResult = connectivityResult;
     initDate();
-    getClockTask();
+    await getClockTask();
     initUser();
   }
 
   ///
   /// 更改当前页面
   ///
-  changePage(int index) {
+  changePage(int index) async {
     _currentIndex = index;
     if (currentIndex == 1) {
-      getTimeTask(date);
+      await getTimeTask(date);
     }
     notifyListeners();
   }
@@ -59,12 +59,12 @@ class MainStateModel extends Model
   ///
   /// 更新时间
   ///
-  updateDate(DateTime dateTime) {
+  Future<void> updateDate(DateTime dateTime) async {
     setDate(dateTime);
     if (currentIndex == 0) {
-      getClockTask();
+      await getClockTask();
     } else if (currentIndex == 1) {
-      getTimeTask(dateTime);
+      await getTimeTask(dateTime);
     }
     notifyListeners();
   }

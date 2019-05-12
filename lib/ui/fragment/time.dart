@@ -39,11 +39,11 @@ class TimeFragment extends StatelessWidget {
             ? Calendar(
                 width: ScreenUtil().setWidth(Constant.width),
                 height: _height,
-                themeData: model.themeData,
                 startDayOfWeek: model.user.startDayOfWeek,
                 language: model.user.language,
                 today: model.today,
                 date: model.date,
+                taskTimes: model.timeTaskTimes,
                 swiperIndex: model.swiperIndex,
                 isWeek: model.isWeek,
                 delegate: SliverChildBuilderDelegate(

@@ -21,7 +21,7 @@ class ClockFlag extends StatelessWidget {
     return IconButton(
       icon: Icon(
         Icons.flag,
-        color: clocked ? Colors.grey : color,
+        color: clocked ? color : Colors.grey ,
       ),
       onPressed: onPressed,
     );

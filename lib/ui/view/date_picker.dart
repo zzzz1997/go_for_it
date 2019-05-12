@@ -409,7 +409,7 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
     int year = _firstDate.year + index;
     bool isSelected =
         _yearIndex == 0 ? _startTime.year == year : _endTime.year == year;
-    bool canSelect = year * _monthLength + _endTime.month >
+    bool canSelect = _yearIndex == 0 || year * _monthLength + _endTime.month >
         _startTime.year * _monthLength + _startTime.month;
     return GestureDetector(
       onTap: canSelect

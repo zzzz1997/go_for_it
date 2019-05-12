@@ -41,11 +41,11 @@ class Calendar extends StatelessWidget {
   Calendar({
     @required this.width,
     @required this.height,
-    @required this.themeData,
     @required this.startDayOfWeek,
     @required this.language,
     @required this.today,
     @required this.date,
+    @required this.taskTimes,
     @required this.swiperIndex,
     @required this.isWeek,
     @required this.delegate,
@@ -64,9 +64,6 @@ class Calendar extends StatelessWidget {
   // 高度
   final double height;
 
-  // 主题
-  final ThemeData themeData;
-
   // 开始星期
   final int startDayOfWeek;
 
@@ -78,6 +75,9 @@ class Calendar extends StatelessWidget {
 
   // 所选日期
   final DateTime date;
+
+  // 普通任务时间列表
+  final List<int> taskTimes;
 
   // swiper位置
   final int swiperIndex;
@@ -94,6 +94,7 @@ class Calendar extends StatelessWidget {
   // swiper换页事件
   final Function onSwiperIndexChange;
 
+  // 滑动事件
   final Function onScroll;
 
   // 滑动控制器
@@ -108,6 +109,7 @@ class Calendar extends StatelessWidget {
     _scrollController.addListener(() {
       onScroll(_scrollController.offset);
     });
+    ThemeData themeData = Theme.of(context);
     return SizedBox(
         width: width,
         height: height,
@@ -117,7 +119,7 @@ class Calendar extends StatelessWidget {
               height: CalendarParam.rowHeight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: _buildWeek(),
+                children: _buildWeek(themeData),
               ),
             ),
             Expanded(
@@ -145,6 +147,7 @@ class Calendar extends StatelessWidget {
                                 startDayOfWeek: startDayOfWeek,
                                 today: today,
                                 date: date,
+                                taskTimes: taskTimes,
                                 isWeek: isWeek,
                                 swiperIndex: swiperIndex,
                                 index: index,
@@ -199,7 +202,7 @@ class Calendar extends StatelessWidget {
   ///
   /// 构建星期栏
   ///
-  List<Widget> _buildWeek() {
+  List<Widget> _buildWeek(ThemeData themeData) {
     List<Widget> week = List(CalendarParam.weekLength);
     for (int i = 0; i < CalendarParam.weekLength; i++) {
       int index = startDayOfWeek - 1 + i;
@@ -344,6 +347,7 @@ class _CalendarView extends AnimatedWidget {
     @required this.startDayOfWeek,
     @required this.today,
     @required this.date,
+    @required this.taskTimes,
     @required this.isWeek,
     @required this.swiperIndex,
     @required this.index,
@@ -364,6 +368,9 @@ class _CalendarView extends AnimatedWidget {
 
   // 当前日期
   final DateTime date;
+
+  // 普通任务时间列表
+  final List<int> taskTimes;
 
   // 是否星期格式
   final bool isWeek;
@@ -394,7 +401,7 @@ class _CalendarView extends AnimatedWidget {
                 startDayOfWeek -
                 (startDayOfWeek > date.weekday ? CalendarParam.weekLength : 0) +
                 CalendarParam.weekLength * _indexOffset(index)));
-        widgets.add(_buildDate(dateTime, isWeek: true));
+        widgets.add(_buildDate(dateTime, taskTimes, isWeek: true));
       }
       return SizedBox(
           width: width,
@@ -414,7 +421,7 @@ class _CalendarView extends AnimatedWidget {
           i < CalendarParam.weekLength * CalendarParam.monthLines;
           i++) {
         DateTime dateTime = firstDay.add(Duration(days: i - preLength));
-        widgets.add(_buildDate(dateTime));
+        widgets.add(_buildDate(dateTime, taskTimes));
         if (dateTime == date) {
           _lineIndex = i ~/ CalendarParam.weekLength;
         }
@@ -443,7 +450,7 @@ class _CalendarView extends AnimatedWidget {
   ///
   /// 日期
   ///
-  Widget _buildDate(DateTime dateTime, {isWeek = false}) {
+  Widget _buildDate(DateTime dateTime, List<int> taskTimes, {isWeek = false}) {
     return InkResponse(
       onTap: () {
         onDateChange(dateTime);
@@ -455,28 +462,52 @@ class _CalendarView extends AnimatedWidget {
         child: Padding(
           padding: EdgeInsets.all(5.0),
           child: Container(
-            decoration: BoxDecoration(
+              decoration: BoxDecoration(
                 color: dateTime == date
                     ? themeData.primaryColor
                     : Colors.transparent,
-                shape: BoxShape.circle),
-            child: Center(
-              child: Text(dateTime.day.toString(),
-                  style: TextStyle(
-                    color: dateTime == date
-                        ? Colors.white
-                        : dateTime == today
-                            ? themeData.primaryColor
-                            : dateTime.month == date.month || isWeek
-                                ? themeData.textTheme.body1.color
-                                : themeData.textTheme.body1.color
-                                    .withOpacity(CalendarParam.opacity),
-                    fontWeight: dateTime == today
-                        ? FontWeight.bold
-                        : themeData.textTheme.body1.fontWeight,
-                  )),
-            ),
-          ),
+                shape: BoxShape.circle,
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  children: <Widget>[
+                    Text(dateTime.day.toString(),
+                        style: TextStyle(
+                          color: dateTime == date
+                              ? Colors.white
+                              : dateTime == today
+                                  ? themeData.primaryColor
+                                  : dateTime.month == date.month || isWeek
+                                      ? themeData.textTheme.body1.color
+                                      : themeData.textTheme.body1.color
+                                          .withOpacity(CalendarParam.opacity),
+                          fontWeight: dateTime == today
+                              ? FontWeight.bold
+                              : themeData.textTheme.body1.fontWeight,
+                        )),
+                    SizedBox(
+                      height: 5.0,
+                    ),
+                    taskTimes.any((time) =>
+                            time * 1000 >= dateTime.millisecondsSinceEpoch &&
+                            time * 1000 <
+                                dateTime
+                                    .add(Duration(days: 1))
+                                    .millisecondsSinceEpoch)
+                        ? Container(
+                            width: 5.0,
+                            height: 5.0,
+                            decoration: BoxDecoration(
+                              color:
+                                  dateTime == date ? Colors.white : Colors.grey,
+                              shape: BoxShape.circle,
+                            ),
+                          )
+                        : SizedBox()
+                  ],
+                ),
+              )),
         ),
       ),
     );

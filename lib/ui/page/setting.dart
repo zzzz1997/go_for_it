@@ -11,14 +11,14 @@ import 'package:go_for_it/util/constant.dart';
 class SettingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<MainStateModel>(
-      builder: (context, child, model) {
-        return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: true,
-            title: Text(Constant.setting),
-          ),
-          body: ListView(
+    return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: true,
+          title: Text(Constant.setting),
+        ),
+        body: ScopedModelDescendant<MainStateModel>(
+            builder: (context, child, model) {
+          return ListView(
             children: <Widget>[
               ListTile(
                 onTap: () {
@@ -47,10 +47,8 @@ class SettingPage extends StatelessWidget {
                 subtitle: Text(Constant.checkModes[model.user.checkMode]),
               ),
             ],
-          ),
-        );
-      },
-    );
+          );
+        }));
   }
 
   ///
@@ -81,9 +79,10 @@ class SettingPage extends StatelessWidget {
                 : model.user.checkMode,
         onChanged: (value) async {
           try {
-            await model.setSelectSetting(setting, value, model.connectivityResult);
+            await model.setSelectSetting(
+                setting, value, model.connectivityResult);
           } catch (e) {
-            Alert.errorBar(context, e.toString() ?? 'error');
+            Alert.errorBarError(context, e);
           }
           Navigator.pop(context);
         },

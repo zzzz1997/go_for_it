@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'step.g.dart';
 
 ///
-/// 打卡任务实体
+/// 打卡足迹实体
 ///
 @JsonSerializable()
 class Step {

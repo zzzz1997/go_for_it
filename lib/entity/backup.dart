@@ -8,8 +8,8 @@ part 'backup.g.dart';
 @JsonSerializable()
 class Backup {
   int id;
-  int name;
-  int backup;
+  String name;
+  String backup;
   int createdTime;
 
   Backup(this.id, this.name, this.backup, this.createdTime);

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:date_format/date_format.dart';
+import 'package:go_for_it/entity/backup.dart';
 import 'package:go_for_it/model/common.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/view/tips_view.dart';
@@ -18,17 +20,17 @@ class BackupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<MainStateModel>(
-      builder: (context, child, model) {
-        if (model.isBackupFirst) {
-          model.refreshBackup(model.user, model.connectivityResult);
-        }
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(Constant.backupAndRecovery),
-            automaticallyImplyLeading: true,
-          ),
-          body: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(Constant.backupAndRecovery),
+        automaticallyImplyLeading: true,
+      ),
+      body: ScopedModelDescendant<MainStateModel>(
+        builder: (context, child, model) {
+          if (model.isBackupFirst) {
+            model.refreshBackup(model.user, model.connectivityResult);
+          }
+          return Column(
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.all(50.0),
@@ -72,7 +74,12 @@ class BackupPage extends StatelessWidget {
                                   onTap: () {
                                     _refreshIndicatorKey.currentState.show();
                                   })
-                              : ListView.builder(itemBuilder: null)
+                              : ListView.builder(
+                                  itemBuilder: (context, index) {
+                                    return _buildBackup(model.backups[index]);
+                                  },
+                                  itemCount: model.backups.length,
+                                )
                           : TipsView(
                               view: Icon(Icons.error_outline,
                                   color: Colors.redAccent,
@@ -90,9 +97,19 @@ class BackupPage extends StatelessWidget {
                 ),
               )
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
+    );
+  }
+
+  ///
+  /// 备份列表构造器
+  ///
+  Widget _buildBackup(Backup backup) {
+    return ListTile(
+      title: Text(backup.name),
+      // todo 操作区
     );
   }
 
@@ -105,10 +122,12 @@ class BackupPage extends StatelessWidget {
         Alert.toast(Constant.noneConnectivity);
       } else {
         try {
-          await model.backupData();
+          String name =
+              '备份${formatDate(DateTime.now(), [yy, mm, dd, hh, nn, ss])}';
+          await model.backupData(model.user, name);
           Alert.successBar(context, Constant.backupSuccess);
         } catch (e) {
-          Alert.errorBar(context, e.toString() ?? 'error');
+          Alert.errorBarError(context, e);
         }
       }
     });

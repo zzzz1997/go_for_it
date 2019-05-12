@@ -1,20 +1,27 @@
-import 'dart:math';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:go_for_it/entity/step.dart';
 import 'package:go_for_it/entity/task.dart';
+import 'package:go_for_it/util/database_helper.dart';
 
 ///
 /// 任务状态管理
 ///
 abstract class TaskModel extends Model {
+
+  // 普通任务时间列表
+  List<int> _timeTaskTimes = [];
+
+  // 获取普通任务时间列表
+  List<int> get timeTaskTimes => _timeTaskTimes;
+
   // 普通任务列表
-  List<Task> _timeTasks;
+  List<Task> _timeTasks = [];
 
   // 获取普通任务列表
   List<Task> get timeTasks => _timeTasks;
 
   // 打卡任务列表
-  List<Task> _clockTasks;
+  List<Task> _clockTasks = [];
 
   // 获取打卡任务列表
   List<Task> get clockTasks => _clockTasks;
@@ -25,82 +32,95 @@ abstract class TaskModel extends Model {
   // 获取打卡足迹
   List<Step> get steps => _steps;
 
+  // 打卡锁
+  List<int> _clockLocks = List();
+
+  // 获取打卡锁
+  List<int> get clockLocks => _clockLocks;
+
   factory TaskModel._() => null;
 
   ///
   /// 刷新任务列表
   ///
-  getTimeTask(DateTime dateTime) {
-    Random random = Random();
-    int length = random.nextInt(10) + 5;
-    _timeTasks = List(length);
-    for (int i = 0; i < length; i++) {
-      _timeTasks[i] = Task(
-          i,
-          0,
-          0,
-          '${dateTime.day}日的任务$i',
-          '',
-          random.nextInt(4),
-          random.nextInt(3),
-          dateTime.millisecondsSinceEpoch ~/ 1000 + random.nextInt(86400),
-          0,
-          0);
-    }
+  Future<void> getTimeTask(DateTime dateTime) async {
+    _timeTaskTimes = await DatabaseHelper().queryTimeTaskTimeList();
+    _timeTasks = await DatabaseHelper().queryTimeTask(dateTime);
   }
 
   ///
   /// 获取打卡任务
   ///
-  getClockTask() {
-    Random random = Random();
-    int length = random.nextInt(10) + 5;
-    _clockTasks = List(length);
-    for (int i = 0; i < length; i++) {
-      int startTime = random.nextInt(10000000) + 1590000000;
-      _clockTasks[i] = Task(
-          i,
-          1,
-          random.nextInt(2),
-          '打卡任务$i',
-          '',
-          random.nextInt(4),
-          random.nextInt(3),
-          startTime,
-          random.nextInt(10000000) + startTime,
-          0);
-    }
-    _steps = List(100);
-    for (int i = 0; i < 100; i++) {
-      int index = random.nextInt(length);
-      _steps[i] = Step(
-        i,
-        index,
-        random.nextInt(
-            _clockTasks[index].endTime - _clockTasks[index].startTime) +
-            _clockTasks[index].startTime,
-        random.nextInt(
-            _clockTasks[index].endTime - _clockTasks[index].startTime) +
-            _clockTasks[index].startTime,
-      );
-    }
+  Future<void> getClockTask() async {
+    _clockTasks = await DatabaseHelper().queryClockTask();
+    _steps = await DatabaseHelper().queryStep();
   }
 
   ///
   /// 更改普通任务状态
   ///
-  changeTimeTaskStatus(int id, int checkMode) {
+  Future<void> changeTimeTaskStatus(int id, int checkMode) async {
     Task task = _timeTasks[_timeTasks.indexWhere((task) => task.id == id)];
-    task.status = (task.status + 1 + (checkMode == 0 ? 1 : 0)) > 2 ? 0 : task.status + 1 + (checkMode == 0 ? 1 : 0);
+    task.status = (task.status + 1 + (checkMode == 0 ? 1 : 0)) > 2
+        ? 0
+        : task.status + 1 + (checkMode == 0 ? 1 : 0);
+    await DatabaseHelper().updateTask(task);
     notifyListeners();
   }
 
   ///
   /// 更改打卡任务状态
   ///
-  changeClockTaskStatus(int id) {
-    Task task = _clockTasks[_clockTasks.indexWhere((task) => task.id == id)];
-    task.status = (task.status + 2) > 2 ? 0 : task.status + 2;
-    notifyListeners();
+  Future<void> changeClockTaskStatus(
+      int id, int stepIndex, DateTime date) async {
+    if (clockLocks.indexOf(id) > -1) {
+      return;
+    } else {
+      _clockLocks.add(id);
+      notifyListeners();
+      if (stepIndex > -1) {
+        Step step = _steps[stepIndex];
+        await DatabaseHelper().deleteStep(step);
+        _steps.remove(step);
+      } else {
+        Step step = Step(0, id, date.millisecondsSinceEpoch ~/ 1000,
+            DateTime
+                .now()
+                .millisecondsSinceEpoch ~/ 1000);
+        step.id = await DatabaseHelper().insertStep(step);
+        _steps.add(step);
+      }
+      _clockLocks.remove(id);
+      notifyListeners();
+    }
+  }
+
+  ///
+  /// 保存任务
+  ///
+  Future<void> saveTask(Task task, String name, String description) async {
+    task.name = name;
+    task.description = description;
+    if (task.id == -1) {
+      await DatabaseHelper().insertTask(task);
+    } else {
+      await DatabaseHelper().updateTask(task);
+    }
+  }
+
+  ///
+  /// 删除任务
+  ///
+  Future<void> deleteTask(Task task) async {
+    if (task.id == -1) {
+      return;
+    }
+    await DatabaseHelper().deleteTask(task);
+    if (task.type == 0) {
+      _timeTaskTimes.removeAt(_timeTaskTimes.indexWhere((time) => time == task.startTime));
+      _timeTasks.removeWhere((t) => t.id == task.id);
+    } else {
+      _clockTasks.removeWhere((t) => t.id == task.id);
+    }
   }
 }

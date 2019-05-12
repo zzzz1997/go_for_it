@@ -42,6 +42,13 @@ class Alert {
   }
 
   ///
+  /// 抛出错误错误提醒bar
+  ///
+  static errorBarError(BuildContext context, Error e) {
+    errorBar(context, e.toString() ?? 'error');
+  }
+
+  ///
   /// 创建确定选择弹窗
   ///
   static showConfirm(BuildContext context, String name, Function callback) {
@@ -65,5 +72,25 @@ class Alert {
                     child: Text(Constant.confirm))
               ]);
         });
+  }
+
+  ///
+  /// 展示关于弹窗
+  ///
+  static showAbout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AboutDialog(
+          applicationIcon: FlutterLogo(),
+          applicationName: Constant.appTag,
+          applicationVersion: 'V1.0.0',
+          applicationLegalese: Constant.appLegalese,
+          children: <Widget>[
+            Text(Constant.appDescription),
+          ],
+        );
+      }
+    );
   }
 }

@@ -2,7 +2,9 @@
 /// 常量工具类
 ///
 class Constant {
-  static const appTag = 'GoForIt';
+  static const appTag = 'Go For It';
+  static const appLegalese = '“Go For It”意为“加油，现在就做”';
+  static const appDescription = 'Work out what you need to do first, and go for it – today.\n首先确定你需要做什么，然后就行动 - 从今天开始。';
 
   static const unknownArea = '未知领域';
 
@@ -76,4 +78,6 @@ class Constant {
 
   static const thing = '事情';
   static const description = '描述';
+  static const deleteTask = '删除该任务？';
+  static const clockTaskMustBeRange = '打卡任务时间应为时间段';
 }

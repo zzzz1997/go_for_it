@@ -8,6 +8,7 @@ import 'package:go_for_it/ui/view/clock_flag.dart';
 import 'package:go_for_it/ui/view/date_picker.dart';
 import 'package:go_for_it/ui/view/half_check_box.dart';
 import 'package:go_for_it/ui/view/importance_view.dart';
+import 'package:go_for_it/util/alert.dart';
 import 'package:go_for_it/util/constant.dart';
 
 ///
@@ -33,7 +34,6 @@ class FullscreenDialog extends StatefulWidget {
 /// 全屏弹窗状态
 ///
 class _FullscreenDialogState extends State<FullscreenDialog> {
-
   // 任务对象
   Task _task;
 
@@ -47,8 +47,21 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
   void initState() {
     super.initState();
 
+    DateTime now = DateTime.now();
     _task = widget.task == null
-        ? Task(0, 0, 0, '', '', 0, 0, 0, 0, 0)
+        ? Task(
+            -1,
+            0,
+            0,
+            '',
+            '',
+            0,
+            0,
+            DateTime(now.year, now.month, now.day).millisecondsSinceEpoch ~/
+                1000,
+            DateTime(now.year, now.month, now.day + 1).millisecondsSinceEpoch ~/
+                1000,
+            0)
         : Task.fromJson(widget.task.toJson());
     _nameController = TextEditingController(text: _task.name);
     _descriptionController = TextEditingController(text: _task.description);
@@ -64,9 +77,13 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
             DateTime.fromMillisecondsSinceEpoch(_task.endTime * 1000);
         return Scaffold(
           appBar: AppBar(
-            title: Text(_task.id == 0 ? Constant.newTask : Constant.editTask),
+            title: Text(_task.id == -1 ? Constant.newTask : Constant.editTask),
             actions: <Widget>[
-              IconButton(icon: Icon(Icons.check), onPressed: _onOkClick),
+              IconButton(
+                  icon: Icon(Icons.check),
+                  onPressed: () {
+                    _onOkClick(model);
+                  }),
             ],
           ),
           body: Padding(
@@ -82,19 +99,19 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
                                 status: _task.status,
                                 color: model.themeData.primaryColor,
                                 onPressed: () {
-                                  _changeTaskStatus(model.user.checkMode);
+                                  _changeTimeTaskStatus(model.user.checkMode);
                                 },
                               )
                             : ClockFlag(
                                 clocked: _task.status == 0,
                                 color: model.themeData.primaryColor,
-                                onPressed: () {},
+                                onPressed: null,
                               ),
                         SizedBox(
                           width: 5.0,
                         ),
                         Expanded(
-                          child: InkResponse(
+                          child: GestureDetector(
                             onTap: () {
                               _onTimeTap(model);
                             },
@@ -125,7 +142,7 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
                           width: 10.0,
                         ),
                         GestureDetector(
-                          onTap: _onTypeTap,
+                          onTap: _task.id > -1 ? null : _onTypeTap,
                           child: SvgPicture.asset(
                             Constant.tabSVGs[_task.type == 0 ? 1 : 0],
                             width: 24.0,
@@ -150,17 +167,24 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
                         labelText: Constant.description,
                       ),
                     ),
-                    InkResponse(
-                      onTap: _onLabelTap,
-                      child: Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: SvgPicture.asset(
-                            Constant.labelSvg,
-                            width: 24.0,
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.label_outline),
+                            onPressed: _onLabelTap,
                           ),
-                        ),
+                          _task.id > -1
+                              ? IconButton(
+                                  icon: Icon(Icons.delete_outline),
+                                  onPressed: () {
+                                    _onDeleteTap(model);
+                                  },
+                                )
+                              : SizedBox()
+                        ],
                       ),
                     )
                   ],
@@ -198,20 +222,32 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
   ///
   /// 确定按钮点击事件
   ///
-  _onOkClick() {}
+  _onOkClick(MainStateModel model) async {
+    if (_task.type == 1 && _task.startTime == _task.endTime) {
+      Alert.toast(Constant.clockTaskMustBeRange);
+    } else {
+      try {
+        if (_task.id == -1) {
+          _task.createdTime = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+        }
+        await model.saveTask(
+            _task, _nameController.text, _descriptionController.text);
+        model.updateDate(model.date);
+        Navigator.pop(context);
+      } catch (e) {
+        Alert.errorBarError(context, e);
+      }
+    }
+  }
 
   ///
   /// 更改任务状态
   ///
-  _changeTaskStatus(int checkMode) {
+  _changeTimeTaskStatus(int checkMode) {
     setState(() {
-      if (_task.type == 0) {
-        _task.status = (_task.status + 1 + (checkMode == 0 ? 1 : 0)) > 2
-            ? 0
-            : _task.status + 1 + (checkMode == 0 ? 1 : 0);
-      } else {
-        _task.status = (_task.status + 2) > 2 ? 0 : _task.status + 2;
-      }
+      _task.status = (_task.status + 1 + (checkMode == 0 ? 1 : 0)) > 2
+          ? 0
+          : _task.status + 1 + (checkMode == 0 ? 1 : 0);
     });
   }
 
@@ -258,6 +294,20 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
   /// 标签点击事件
   ///
   _onLabelTap() {
+    Alert.toast('暂未实现');
+  }
 
+  ///
+  /// 删除点击事件
+  ///
+  _onDeleteTap(MainStateModel model) {
+    Alert.showConfirm(context, Constant.deleteTask, () async {
+      try {
+        await model.deleteTask(_task);
+        Navigator.pop(context);
+      } catch (e) {
+        Alert.errorBarError(context, e);
+      }
+    });
   }
 }

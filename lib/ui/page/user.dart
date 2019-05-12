@@ -14,46 +14,45 @@ import 'package:go_for_it/util/transition.dart';
 class UserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<MainStateModel>(
-        builder: (context, widget, model) {
-      return Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text(Constant.userCenter),
         ),
-        body: model.user.isLogin
-            ? ListView(
-                children: <Widget>[
-                  ListTile(
-                    onTap: () {
-                      _changeAvatar(model);
-                    },
-                    title: Text(Constant.avatar),
-                    trailing: CircleAvatar(
-                        backgroundImage:
-                            CachedNetworkImageProvider(model.user.avatar)),
-                  ),
-                  ListTile(
-                    title: Text(Constant.username),
-                    subtitle: Text(model.user.username),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: RaisedButton(
-                      onPressed: () {
-                        _exitLogin(context, model);
+        body: ScopedModelDescendant<MainStateModel>(
+            builder: (context, widget, model) {
+          return model.user.isLogin
+              ? ListView(
+                  children: <Widget>[
+                    ListTile(
+                      onTap: () {
+                        _changeAvatar(model);
                       },
-                      child: Text(
-                        Constant.exitLogin,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      color: Colors.redAccent,
+                      title: Text(Constant.avatar),
+                      trailing: CircleAvatar(
+                          backgroundImage:
+                              CachedNetworkImageProvider(model.user.avatar)),
                     ),
-                  )
-                ],
-              )
-            : Text(Constant.unknownArea),
-      );
-    });
+                    ListTile(
+                      title: Text(Constant.username),
+                      subtitle: Text(model.user.username),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: RaisedButton(
+                        onPressed: () {
+                          _exitLogin(context, model);
+                        },
+                        child: Text(
+                          Constant.exitLogin,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        color: Colors.redAccent,
+                      ),
+                    )
+                  ],
+                )
+              : Text(Constant.unknownArea);
+        }));
   }
 
   ///
@@ -76,7 +75,7 @@ class UserPage extends StatelessWidget {
       Transition.pushAndRemoveUntil(
           context, HomePage(), TransitionType.inFromBottom);
     } catch (e) {
-      Alert.errorBar(context, e.toString() ?? 'error');
+      Alert.errorBarError(context, e);
     }
   }
 }

@@ -1,8 +1,11 @@
 import 'package:scoped_model/scoped_model.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:go_for_it/entity/backup.dart';
+import 'package:go_for_it/entity/step.dart';
+import 'package:go_for_it/entity/task.dart';
 import 'package:go_for_it/model/common.dart';
 import 'package:go_for_it/service/backup.dart';
+import 'package:go_for_it/util/database_helper.dart';
 
 ///
 /// 备份管理
@@ -54,7 +57,19 @@ abstract class BackupModel extends Model {
   ///
   /// 备份数据
   ///
-  Future<void> backupData() async {
-
+  Future<void> backupData(user, String name) async {
+    try {
+      List<Task> tasks = await DatabaseHelper().queryTask();
+      List<Step> steps = await DatabaseHelper().queryStep();
+      Map<String, dynamic> map = {
+        'tasks': tasks.map((task) => task.toJson()).toList().toString(),
+        'steps': steps.map((step) => step.toJson()).toList().toString(),
+      };
+      Backup backup = await BackupService.backup(user, name, map.toString());
+      _backups.add(backup);
+      notifyListeners();
+    } catch (e) {
+      throw e;
+    }
   }
 }

@@ -1,9 +1,9 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:go_for_it/entity/user.dart';
+import 'package:go_for_it/entity/step.dart';
+import 'package:go_for_it/entity/task.dart';
 import 'package:go_for_it/util/constant.dart';
-
-const _userFields = ['id', 'username', 'avatar', 'language', 'startDayOfWeek', 'checkMode', 'token', 'tokenTime', 'createdTime'];
 
 ///
 /// 数据库工具
@@ -72,7 +72,7 @@ class DatabaseHelper {
     await db.execute('''
      CREATE TABLE Step (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      Task_id int(10) NOT NULL,
+      taskId int(10) NOT NULL,
       targetTime int(10) NOT NULL,
       createdTime int(10) NOT NULL
     );
@@ -87,9 +87,7 @@ class DatabaseHelper {
   ///
   Future<User> getUser() async {
     Database dbClient = await db;
-    return User.fromJson((await dbClient.query('User',
-      columns: _userFields,
-    ))[0]);
+    return User.fromJson((await dbClient.query('User'))[0]);
   }
 
   ///
@@ -98,6 +96,104 @@ class DatabaseHelper {
   Future<int> updateUser(User user) async {
     Database dbClient = await db;
     return await dbClient.update('User', user.toJson());
+  }
+
+  ///
+  /// 获取任务列表
+  ///
+  Future<List<Task>> queryTask() async {
+    Database dbClient = await db;
+    List<Map<String, dynamic>> tasks = await dbClient.query('Task');
+    return tasks.map((d) => Task.fromJson(d)).toList();
+  }
+
+  ///
+  /// 获取普通任务时间列表
+  ///
+  Future<List<int>> queryTimeTaskTimeList() async {
+    Database dbClient = await db;
+    List<Map<String, dynamic>> list = await dbClient.query('Task',
+        columns: ['startTime'],
+        where: 'type = ?',
+        whereArgs: [0]);
+    return list.map((m) => m['startTime'] as int).toList();
+  }
+
+  ///
+  /// 获取某日普通任务列表
+  ///
+  Future<List<Task>> queryTimeTask(DateTime dateTime) async {
+    Database dbClient = await db;
+    List<Map<String, dynamic>> tasks = await dbClient.query('Task',
+        where: 'type = ? and startTime = ?',
+        whereArgs: [0, dateTime.millisecondsSinceEpoch ~/ 1000]);
+    return tasks.map((d) => Task.fromJson(d)).toList();
+  }
+
+  ///
+  /// 获取打卡任务列表
+  ///
+  Future<List<Task>> queryClockTask() async {
+    Database dbClient = await db;
+    List<Map<String, dynamic>> tasks =
+        await dbClient.query('Task', where: 'type = ?', whereArgs: [1]);
+    return tasks.map((d) => Task.fromJson(d)).toList();
+  }
+
+  ///
+  /// 获取打卡足迹列表
+  ///
+  Future<List<Step>> queryStep() async {
+    Database dbClient = await db;
+    List<Map<String, dynamic>> steps = await dbClient.query('Step');
+    return steps.map((d) => Step.fromJson(d)).toList();
+  }
+
+  ///
+  /// 添加任务信息
+  ///
+  Future<int> insertTask(Task task) async {
+    Database dbClient = await db;
+    Map<String, dynamic> map = task.toJson();
+    map.remove('id');
+    return await dbClient.insert('Task', map);
+  }
+
+  ///
+  /// 更新任务信息
+  ///
+  Future<int> updateTask(Task task) async {
+    Database dbClient = await db;
+    Map<String, dynamic> map = task.toJson();
+    map.remove('id');
+    return await dbClient
+        .update('Task', map, where: 'id = ?', whereArgs: [task.id]);
+  }
+
+  ///
+  /// 删除任务
+  ///
+  Future<int> deleteTask(Task task) async {
+    Database dbClient = await db;
+    return await dbClient.delete('Task', where: 'id = ?', whereArgs: [task.id]);
+  }
+
+  ///
+  /// 插入打卡足迹
+  ///
+  Future<int> insertStep(Step step) async {
+    Database dbClient = await db;
+    Map<String, dynamic> map = step.toJson();
+    map.remove('id');
+    return await dbClient.insert('Step', map);
+  }
+
+  ///
+  /// 删除打卡足迹
+  ///
+  Future<int> deleteStep(Step step) async {
+    Database dbClient = await db;
+    return await dbClient.delete('Step', where: 'id = ?', whereArgs: [step.id]);
   }
 
   ///

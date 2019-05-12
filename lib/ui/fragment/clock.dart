@@ -39,11 +39,11 @@ class ClockFragment extends StatelessWidget {
               ? Calendar(
                   width: ScreenUtil().setWidth(Constant.width),
                   height: _height,
-                  themeData: model.themeData,
                   startDayOfWeek: model.user.startDayOfWeek,
                   language: model.user.language,
                   today: model.today,
                   date: model.date,
+                  taskTimes: [],
                   swiperIndex: model.swiperIndex,
                   isWeek: model.isWeek,
                   delegate: SliverChildBuilderDelegate(
@@ -55,17 +55,24 @@ class ClockFragment extends StatelessWidget {
                       }
                       Task task = model.clockTasks[index];
                       var steps = model.steps
-                          .where((step) => step.taskId == task.id)
+                          .where((step) =>
+                              step.taskId == task.id &&
+                              step.targetTime >= task.startTime &&
+                              step.targetTime <= task.endTime)
                           .toList();
                       int length = steps.length;
                       List<int> data = List(length);
                       for (int i = 0; i < length; i++) {
                         data[i] = DateTime.fromMillisecondsSinceEpoch(
-                                steps[i].createdTime * 1000)
+                                steps[i].targetTime * 1000)
                             .difference(DateTime.fromMillisecondsSinceEpoch(
                                 task.startTime * 1000))
                             .inDays;
                       }
+                      int stepIndex = model.steps.indexWhere((step) =>
+                          step.taskId == task.id &&
+                          step.targetTime ==
+                              model.date.millisecondsSinceEpoch ~/ 1000);
                       return GestureDetector(
                         onTap: () {
                           ModalUtil.showTaskModal(context, task, task.type);
@@ -100,7 +107,12 @@ class ClockFragment extends StatelessWidget {
                                                 TextSpan(children: <TextSpan>[
                                                   TextSpan(text: '已坚持'),
                                                   TextSpan(
-                                                      text: length.toString(),
+                                                      text: model.steps
+                                                          .where((step) =>
+                                                              step.taskId ==
+                                                              task.id)
+                                                          .length
+                                                          .toString(),
                                                       style: TextStyle(
                                                           color: Colors.red)),
                                                   TextSpan(text: '天')
@@ -111,27 +123,34 @@ class ClockFragment extends StatelessWidget {
                                         ],
                                       ),
                                       ClockFlag(
-                                          clocked: task.status == 2,
+                                          clocked: stepIndex > -1,
                                           color: model.themeData.primaryColor,
-                                          onPressed: () {
-                                            model.changeClockTaskStatus(task.id);
-                                          }
-                                      ),
+                                          onPressed: model.clockLocks
+                                                      .indexOf(task.id) >
+                                                  -1
+                                              ? null
+                                              : () {
+                                                  model.changeClockTaskStatus(
+                                                      task.id,
+                                                      stepIndex,
+                                                      model.date);
+                                                }),
                                     ],
                                   ),
                                   ClockProgress(
                                     width:
                                         ScreenUtil().setWidth(Constant.width),
-                                    height: 5,
+                                    height: 5.0,
                                     frontColor: Colors.grey,
                                     backColor: Colors.grey.withOpacity(0.2),
                                     total: DateTime.fromMillisecondsSinceEpoch(
-                                            task.endTime * 1000)
-                                        .difference(
-                                            DateTime.fromMillisecondsSinceEpoch(
-                                                task.startTime * 1000))
-                                        .inDays
-                                        .abs(),
+                                                task.endTime * 1000)
+                                            .difference(DateTime
+                                                .fromMillisecondsSinceEpoch(
+                                                    task.startTime * 1000))
+                                            .inDays
+                                            .abs() +
+                                        1,
                                     data: data,
                                   )
                                 ],
