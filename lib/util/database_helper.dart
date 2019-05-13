@@ -197,6 +197,32 @@ class DatabaseHelper {
   }
 
   ///
+  /// 恢复数据
+  ///
+  Future<bool> recovery(List<Task> tasks, List<Step> steps) async {
+    Database dbClient = await db;
+    await dbClient.execute('''
+    delete from Task;
+    ''');
+    await dbClient.execute('''
+    update sqlite_sequence SET seq = 0 where name = 'Task';
+    ''');
+    for (Task task in tasks) {
+      await dbClient.insert('Task', task.toJson());
+    }
+    await dbClient.execute('''
+    delete from Step;
+    ''');
+    await dbClient.execute('''
+    update sqlite_sequence SET seq = 0 where name = 'Step';
+    ''');
+    for (Step step in steps) {
+      await dbClient.insert('Step', step.toJson());
+    }
+    return true;
+  }
+
+  ///
   /// 关闭数据库
   ///
   Future<void> close() async {

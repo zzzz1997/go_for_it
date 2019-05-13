@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_for_it/entity/task.dart';
 import 'package:go_for_it/model/main.dart';
 import 'package:go_for_it/ui/fragment/clock.dart';
 import 'package:go_for_it/ui/fragment/time.dart';
@@ -181,7 +182,17 @@ class HomePage extends StatelessWidget {
   /// 显示新建模态框
   ///
   _showAddModal(BuildContext context, MainStateModel model) {
-    ModalUtil.showTaskModal(context, null, model.currentIndex == 0 ? 1 : 0);
+    ModalUtil.showTaskModal(context, Task(
+        -1,
+        model.currentIndex == 0 ? 1 : 0,
+        0,
+        '',
+        '',
+        0,
+        0,
+        model.date.millisecondsSinceEpoch ~/ 1000,
+        model.date.add(Duration(days: 1)).millisecondsSinceEpoch ~/ 1000,
+        0));
   }
 
   ///

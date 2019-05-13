@@ -75,7 +75,7 @@ class ClockFragment extends StatelessWidget {
                               model.date.millisecondsSinceEpoch ~/ 1000);
                       return GestureDetector(
                         onTap: () {
-                          ModalUtil.showTaskModal(context, task, task.type);
+                          ModalUtil.showTaskModal(context, task);
                         },
                         child: Material(
                           child: SizedBox(

@@ -56,7 +56,7 @@ class TimeFragment extends StatelessWidget {
                     Task task = model.timeTasks[index];
                     return GestureDetector(
                       onTap: () {
-                        ModalUtil.showTaskModal(context, task, task.type);
+                        ModalUtil.showTaskModal(context, task);
                       },
                       child: Material(
                         child: SizedBox(

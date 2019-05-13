@@ -6,9 +6,11 @@ import 'package:date_format/date_format.dart';
 import 'package:go_for_it/entity/backup.dart';
 import 'package:go_for_it/model/common.dart';
 import 'package:go_for_it/model/main.dart';
+import 'package:go_for_it/ui/page/home.dart';
 import 'package:go_for_it/ui/view/tips_view.dart';
 import 'package:go_for_it/util/alert.dart';
 import 'package:go_for_it/util/constant.dart';
+import 'package:go_for_it/util/transition.dart';
 
 ///
 /// 备份与恢复页面
@@ -40,7 +42,7 @@ class BackupPage extends StatelessWidget {
                 child: Text(Constant.backup,
                     style: TextStyle(color: Colors.white)),
                 onPressed: () {
-                  _newBackup(context, model);
+                  _onBackupPressed(context, model);
                 },
                 color: model.themeData.primaryColor,
                 shape: StadiumBorder(),
@@ -76,7 +78,8 @@ class BackupPage extends StatelessWidget {
                                   })
                               : ListView.builder(
                                   itemBuilder: (context, index) {
-                                    return _buildBackup(model.backups[index]);
+                                    return _buildBackup(
+                                        context, model, model.backups[index]);
                                   },
                                   itemCount: model.backups.length,
                                 )
@@ -106,26 +109,101 @@ class BackupPage extends StatelessWidget {
   ///
   /// 备份列表构造器
   ///
-  Widget _buildBackup(Backup backup) {
-    return ListTile(
-      title: Text(backup.name),
-      // todo 操作区
-    );
+  Widget _buildBackup(
+      BuildContext context, MainStateModel model, Backup backup) {
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.0),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    backup.name,
+                    style: model.themeData.textTheme.title,
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Text(formatDate(
+                      DateTime.fromMillisecondsSinceEpoch(
+                          backup.createdTime * 1000),
+                      [yy, '年', m, '月', d, '日', H, '时', n, '分', ss, '秒']))
+                ],
+              ),
+              ButtonTheme.bar(
+                child: ButtonBar(
+                  children: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        _onRecoveryPressed(context, model, backup);
+                      },
+                      child: Text(Constant.recovery),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        _onDeletePressed(context, model, backup);
+                      },
+                      child: Text(Constant.delete),
+                    )
+                  ],
+                ),
+              ),
+            ]));
   }
 
   ///
-  /// 新建备份
+  /// 备份点击事件
   ///
-  _newBackup(BuildContext context, MainStateModel model) {
+  _onBackupPressed(BuildContext context, MainStateModel model) {
     Alert.showConfirm(context, Constant.newBackup, () async {
       if (model.connectivityResult == ConnectivityResult.none) {
         Alert.toast(Constant.noneConnectivity);
       } else {
         try {
           String name =
-              '备份${formatDate(DateTime.now(), [yy, mm, dd, hh, nn, ss])}';
+              '备份${formatDate(DateTime.now(), [yy, mm, dd, HH, nn, ss])}';
           await model.backupData(model.user, name);
           Alert.successBar(context, Constant.backupSuccess);
+        } catch (e) {
+          Alert.errorBarError(context, e);
+        }
+      }
+    });
+  }
+
+  ///
+  /// 恢复点击事件
+  ///
+  _onRecoveryPressed(
+      BuildContext context, MainStateModel model, Backup backup) {
+    Alert.showConfirm(context, Constant.recoveryData, () async {
+      if (model.connectivityResult == ConnectivityResult.none) {
+        Alert.toast(Constant.noneConnectivity);
+      } else {
+        try {
+          await model.recoveryData(model.user, backup);
+          Transition.pushAndRemoveUntil(
+              context, HomePage(), TransitionType.inFromBottom);
+        } catch (e) {
+          Alert.errorBarError(context, e);
+        }
+      }
+    });
+  }
+
+  ///
+  /// 删除点击事件
+  ///
+  _onDeletePressed(BuildContext context, MainStateModel model, Backup backup) {
+    Alert.showConfirm(context, Constant.deleteBackup, () async {
+      if (model.connectivityResult == ConnectivityResult.none) {
+        Alert.toast(Constant.noneConnectivity);
+      } else {
+        try {
+          await model.deleteBackup(model.user, backup);
+          Alert.successBar(context, Constant.deleteSuccess);
         } catch (e) {
           Alert.errorBarError(context, e);
         }

@@ -16,13 +16,10 @@ import 'package:go_for_it/util/constant.dart';
 ///
 // ignore: must_be_immutable
 class FullscreenDialog extends StatefulWidget {
-  FullscreenDialog({@required this.task, @required this.type});
+  FullscreenDialog({@required this.task});
 
   // 任务对象
   final Task task;
-
-  // 任务类型
-  final int type;
 
   @override
   State<StatefulWidget> createState() {
@@ -47,22 +44,7 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
   void initState() {
     super.initState();
 
-    DateTime now = DateTime.now();
-    _task = widget.task == null
-        ? Task(
-            -1,
-            0,
-            0,
-            '',
-            '',
-            0,
-            0,
-            DateTime(now.year, now.month, now.day).millisecondsSinceEpoch ~/
-                1000,
-            DateTime(now.year, now.month, now.day + 1).millisecondsSinceEpoch ~/
-                1000,
-            0)
-        : Task.fromJson(widget.task.toJson());
+    _task = Task.fromJson(widget.task.toJson());
     _nameController = TextEditingController(text: _task.name);
     _descriptionController = TextEditingController(text: _task.description);
   }

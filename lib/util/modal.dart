@@ -9,12 +9,11 @@ class ModalUtil {
   ///
   /// 显示任务弹窗
   ///
-  static void showTaskModal(context, task, type) {
+  static void showTaskModal(context, task) {
     Navigator.of(context).push(MaterialPageRoute<Null>(
       builder: (BuildContext context) {
         return FullscreenDialog(
           task: task,
-          type: type,
         );
       },
       fullscreenDialog: true,

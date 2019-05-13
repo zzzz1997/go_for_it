@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:go_for_it/entity/backup.dart';
+import 'package:go_for_it/entity/bean.dart';
 import 'package:go_for_it/entity/step.dart';
 import 'package:go_for_it/entity/task.dart';
 import 'package:go_for_it/model/common.dart';
@@ -11,7 +13,6 @@ import 'package:go_for_it/util/database_helper.dart';
 /// 备份管理
 ///
 abstract class BackupModel extends Model {
-
   // 是否第一次刷新
   bool _isBackupFirst = true;
 
@@ -61,12 +62,36 @@ abstract class BackupModel extends Model {
     try {
       List<Task> tasks = await DatabaseHelper().queryTask();
       List<Step> steps = await DatabaseHelper().queryStep();
-      Map<String, dynamic> map = {
-        'tasks': tasks.map((task) => task.toJson()).toList().toString(),
-        'steps': steps.map((step) => step.toJson()).toList().toString(),
-      };
-      Backup backup = await BackupService.backup(user, name, map.toString());
+      Backup backup = await BackupService.backup(
+          user, name, jsonEncode(Bean(tasks, steps).toJson()));
       _backups.add(backup);
+      notifyListeners();
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  ///
+  /// 恢复数据
+  ///
+  Future<void> recoveryData(user, backup) async {
+    try {
+      Backup b = await BackupService.getBackup(user, backup);
+      Bean bean = Bean.fromJson(jsonDecode(b.backup));
+      await DatabaseHelper().recovery(bean.tasks, bean.steps);
+      notifyListeners();
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  ///
+  /// 删除数据
+  ///
+  Future<void> deleteBackup(user, backup) async {
+    try {
+      await BackupService.delete(user, backup);
+      _backups.removeWhere((b) => b.id == backup.id);
       notifyListeners();
     } catch (e) {
       throw e;

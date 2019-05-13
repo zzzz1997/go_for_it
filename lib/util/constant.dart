@@ -73,6 +73,11 @@ class Constant {
   static const loading = '加载中...';
   static const loadError = '加载错误';
   static const noBackup = '没有备份历史，新建一个';
+  static const recovery = '恢复';
+  static const recoveryData = '恢复数据？\n！！该操作会造成未备份的本地数据丢失';
+  static const delete = '删除';
+  static const deleteBackup = '删除该备份？';
+  static const deleteSuccess = '删除成功';
 
   static const about = '关于';
 
@@ -80,4 +85,6 @@ class Constant {
   static const description = '描述';
   static const deleteTask = '删除该任务？';
   static const clockTaskMustBeRange = '打卡任务时间应为时间段';
+
+  static const todayTask = '今日任务';
 }
