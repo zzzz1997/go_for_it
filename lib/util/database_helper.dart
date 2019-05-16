@@ -113,9 +113,7 @@ class DatabaseHelper {
   Future<List<int>> queryTimeTaskTimeList() async {
     Database dbClient = await db;
     List<Map<String, dynamic>> list = await dbClient.query('Task',
-        columns: ['startTime'],
-        where: 'type = ?',
-        whereArgs: [0]);
+        columns: ['startTime'], where: 'type = ?', whereArgs: [0]);
     return list.map((m) => m['startTime'] as int).toList();
   }
 
@@ -147,6 +145,23 @@ class DatabaseHelper {
     Database dbClient = await db;
     List<Map<String, dynamic>> steps = await dbClient.query('Step');
     return steps.map((d) => Step.fromJson(d)).toList();
+  }
+
+  ///
+  /// 获取今日任务列表
+  ///
+  Future<List<Task>> queryTodayTask() async {
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    Database dbClient = await db;
+    List<Map<String, dynamic>> tasks = await dbClient.query('Task',
+        where: 'startTime <= ? and endTime > ?',
+        whereArgs: [
+          today.millisecondsSinceEpoch ~/ 1000,
+          today.millisecondsSinceEpoch ~/ 1000
+        ],
+        orderBy: 'type desc');
+    return tasks.map((d) => Task.fromJson(d)).toList();
   }
 
   ///

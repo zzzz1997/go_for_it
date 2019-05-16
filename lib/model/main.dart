@@ -50,8 +50,12 @@ class MainStateModel extends Model
   ///
   changePage(int index) async {
     _currentIndex = index;
-    if (currentIndex == 1) {
+    if (currentIndex == 0) {
+      await getClockTask();
+    } else if (currentIndex == 1) {
       await getTimeTask(date);
+    } else if (currentIndex == 2) {
+      await getTodayTask();
     }
     notifyListeners();
   }
@@ -65,6 +69,8 @@ class MainStateModel extends Model
       await getClockTask();
     } else if (currentIndex == 1) {
       await getTimeTask(dateTime);
+    } else {
+      await getTodayTask();
     }
     notifyListeners();
   }

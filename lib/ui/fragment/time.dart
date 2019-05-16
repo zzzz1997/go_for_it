@@ -98,7 +98,7 @@ class TimeFragment extends StatelessWidget {
                                         color: model.themeData.primaryColor,
                                         onPressed: () {
                                           model.changeTimeTaskStatus(
-                                              task.id, model.user.checkMode);
+                                              task.id, model.user.checkMode, 1);
                                         },
                                       ),
                                     ],

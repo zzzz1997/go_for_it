@@ -7,7 +7,6 @@ import 'package:go_for_it/util/database_helper.dart';
 /// 任务状态管理
 ///
 abstract class TaskModel extends Model {
-
   // 普通任务时间列表
   List<int> _timeTaskTimes = [];
 
@@ -38,10 +37,22 @@ abstract class TaskModel extends Model {
   // 获取打卡锁
   List<int> get clockLocks => _clockLocks;
 
+  // 今日任务时间列表
+  List<Task> _todayTasks = [];
+
+  // 获取今日任务时间列表
+  List<Task> get todayTasks => _todayTasks;
+
+  // 今日打卡足迹
+  List<Step> _todaySteps;
+
+  // 获取今日打卡足迹
+  List<Step> get todaySteps => _todaySteps;
+
   factory TaskModel._() => null;
 
   ///
-  /// 刷新任务列表
+  /// 获取普通任务
   ///
   Future<void> getTimeTask(DateTime dateTime) async {
     _timeTaskTimes = await DatabaseHelper().queryTimeTaskTimeList();
@@ -57,10 +68,20 @@ abstract class TaskModel extends Model {
   }
 
   ///
+  /// 获取今日任务
+  ///
+  Future<void> getTodayTask() async {
+    _todayTasks = await DatabaseHelper().queryTodayTask();
+    _todaySteps = await DatabaseHelper().queryStep();
+  }
+
+  ///
   /// 更改普通任务状态
   ///
-  Future<void> changeTimeTaskStatus(int id, int checkMode) async {
-    Task task = _timeTasks[_timeTasks.indexWhere((task) => task.id == id)];
+  Future<void> changeTimeTaskStatus(int id, int checkMode, int index) async {
+    Task task = (index == 1 ? _timeTasks : _todayTasks)[
+        (index == 1 ? _timeTasks : _todayTasks)
+            .indexWhere((task) => task.id == id)];
     task.status = (task.status + 1 + (checkMode == 0 ? 1 : 0)) > 2
         ? 0
         : task.status + 1 + (checkMode == 0 ? 1 : 0);
@@ -72,23 +93,21 @@ abstract class TaskModel extends Model {
   /// 更改打卡任务状态
   ///
   Future<void> changeClockTaskStatus(
-      int id, int stepIndex, DateTime date) async {
+      int id, int stepIndex, DateTime date, int index) async {
     if (clockLocks.indexOf(id) > -1) {
       return;
     } else {
       _clockLocks.add(id);
       notifyListeners();
       if (stepIndex > -1) {
-        Step step = _steps[stepIndex];
+        Step step = (index == 0 ? _steps : _todaySteps)[stepIndex];
         await DatabaseHelper().deleteStep(step);
-        _steps.remove(step);
+        (index == 0 ? _steps : _todaySteps).remove(step);
       } else {
         Step step = Step(0, id, date.millisecondsSinceEpoch ~/ 1000,
-            DateTime
-                .now()
-                .millisecondsSinceEpoch ~/ 1000);
+            DateTime.now().millisecondsSinceEpoch ~/ 1000);
         step.id = await DatabaseHelper().insertStep(step);
-        _steps.add(step);
+        (index == 0 ? _steps : _todaySteps).add(step);
       }
       _clockLocks.remove(id);
       notifyListeners();
@@ -117,7 +136,8 @@ abstract class TaskModel extends Model {
     }
     await DatabaseHelper().deleteTask(task);
     if (task.type == 0) {
-      _timeTaskTimes.removeAt(_timeTaskTimes.indexWhere((time) => time == task.startTime));
+      _timeTaskTimes.removeAt(
+          _timeTaskTimes.indexWhere((time) => time == task.startTime));
       _timeTasks.removeWhere((t) => t.id == task.id);
     } else {
       _clockTasks.removeWhere((t) => t.id == task.id);

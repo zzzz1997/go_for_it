@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           title: Text('${model.date.month}/${model.date.day}'),
           actions: <Widget>[
-            model.date != model.today
+            model.currentIndex != 2 && model.date != model.today
                 ? GestureDetector(
                     onTap: () {
                       model.updateDate(model.today);
@@ -125,7 +125,6 @@ class HomePage extends StatelessWidget {
               ))
             ],
           ),
-          semanticLabel: 'hhh',
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -182,17 +181,19 @@ class HomePage extends StatelessWidget {
   /// 显示新建模态框
   ///
   _showAddModal(BuildContext context, MainStateModel model) {
-    ModalUtil.showTaskModal(context, Task(
-        -1,
-        model.currentIndex == 0 ? 1 : 0,
-        0,
-        '',
-        '',
-        0,
-        0,
-        model.date.millisecondsSinceEpoch ~/ 1000,
-        model.date.add(Duration(days: 1)).millisecondsSinceEpoch ~/ 1000,
-        0));
+    ModalUtil.showTaskModal(
+        context,
+        Task(
+            -1,
+            model.currentIndex == 0 ? 1 : 0,
+            0,
+            '',
+            '',
+            0,
+            0,
+            model.date.millisecondsSinceEpoch ~/ 1000,
+            model.date.add(Duration(days: 1)).millisecondsSinceEpoch ~/ 1000,
+            0));
   }
 
   ///

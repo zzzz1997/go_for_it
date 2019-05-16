@@ -133,7 +133,8 @@ class ClockFragment extends StatelessWidget {
                                                   model.changeClockTaskStatus(
                                                       task.id,
                                                       stepIndex,
-                                                      model.date);
+                                                      model.date,
+                                                      0);
                                                 }),
                                     ],
                                   ),
