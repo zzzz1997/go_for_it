@@ -38,7 +38,7 @@ class UserPage extends StatelessWidget {
                     ),
                     Padding(
                       padding: EdgeInsets.all(20.0),
-                      child: RaisedButton(
+                      child: ElevatedButton(
                         onPressed: () {
                           _exitLogin(context, model);
                         },
@@ -46,7 +46,10 @@ class UserPage extends StatelessWidget {
                           Constant.exitLogin,
                           style: TextStyle(color: Colors.white),
                         ),
-                        color: Colors.redAccent,
+                        style: ButtonStyle(
+                          foregroundColor:
+                              MaterialStateProperty.all(Colors.redAccent),
+                        ),
                       ),
                     )
                   ],
