@@ -5,30 +5,21 @@ import 'package:dio/dio.dart';
 ///
 class Api {
   // 获取dio实例
-  static Dio get dio => _getDio();
+  static Dio get dio => _dio;
 
   // dio实例
-  static Dio _dio;
+  static final _dio = Dio();
 
   // 基础url
-  static final baseUrl = 'http://113.55.60.71:8080';
-
-  ///
-  /// 获取单例dio
-  ///
-  static Dio _getDio() {
-    if (_dio == null) {
-      _dio = Dio();
-    }
-    return _dio;
-  }
+  static final baseUrl = 'https://goforit.zzzz1997.com';
 
   ///
   /// get请求
   ///
   static get(url, {queryParameters, token}) async {
     try {
-      Response response = await dio.get(baseUrl + url,
+      Response response = await dio.get(
+        baseUrl + url,
         queryParameters: queryParameters,
         options: token != null ? Options(headers: {'token': token}) : null,
       );
@@ -47,8 +38,9 @@ class Api {
   ///
   static post(url, {data, token}) async {
     try {
-      Response response = await dio.post(baseUrl + url,
-        data: FormData.from(data),
+      Response response = await dio.post(
+        baseUrl + url,
+        data: FormData.fromMap(data),
         options: token != null ? Options(headers: {'token': token}) : null,
       );
       if (response.data['code'] == 200) {

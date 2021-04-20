@@ -26,13 +26,13 @@ abstract class TaskModel extends Model {
   List<Task> get clockTasks => _clockTasks;
 
   // 打卡足迹
-  List<Step> _steps;
+  late List<Step> _steps;
 
   // 获取打卡足迹
   List<Step> get steps => _steps;
 
   // 打卡锁
-  List<int> _clockLocks = List();
+  List<int> _clockLocks = [];
 
   // 获取打卡锁
   List<int> get clockLocks => _clockLocks;
@@ -44,12 +44,10 @@ abstract class TaskModel extends Model {
   List<Task> get todayTasks => _todayTasks;
 
   // 今日打卡足迹
-  List<Step> _todaySteps;
+  late List<Step> _todaySteps;
 
   // 获取今日打卡足迹
   List<Step> get todaySteps => _todaySteps;
-
-  factory TaskModel._() => null;
 
   ///
   /// 获取普通任务

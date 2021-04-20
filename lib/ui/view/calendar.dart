@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 ///
 /// 日历参数
@@ -39,24 +39,21 @@ class CalendarParam {
 ///
 class Calendar extends StatelessWidget {
   Calendar({
-    @required this.width,
-    @required this.height,
-    @required this.startDayOfWeek,
-    @required this.language,
-    @required this.today,
-    @required this.date,
-    @required this.taskTimes,
-    @required this.swiperIndex,
-    @required this.isWeek,
-    @required this.delegate,
-    @required this.onDateChange,
-    @required this.onSwiperIndexChange,
-    @required this.onScroll,
-  })  : assert(startDayOfWeek >= 1 && startDayOfWeek <= 7),
-        assert(swiperIndex >= 0 && swiperIndex <= 2),
-        assert(onDateChange != null),
-        assert(onSwiperIndexChange != null),
-        assert(onScroll != null);
+    required this.width,
+    required this.height,
+    required this.startDayOfWeek,
+    required this.language,
+    required this.today,
+    required this.date,
+    required this.taskTimes,
+    required this.swiperIndex,
+    required this.isWeek,
+    required this.delegate,
+    required this.onDateChange,
+    required this.onSwiperIndexChange,
+    required this.onScroll,
+  })   : assert(startDayOfWeek >= 1 && startDayOfWeek <= 7),
+        assert(swiperIndex >= 0 && swiperIndex <= 2);
 
   // 宽度
   final double width;
@@ -203,11 +200,11 @@ class Calendar extends StatelessWidget {
   /// 构建星期栏
   ///
   List<Widget> _buildWeek(ThemeData themeData) {
-    List<Widget> week = List(CalendarParam.weekLength);
+    List<Widget> week = [];
     for (int i = 0; i < CalendarParam.weekLength; i++) {
       int index = startDayOfWeek - 1 + i;
       index = index >= 7 ? index - CalendarParam.weekLength : index;
-      week[i] = SizedBox(
+      week.add(SizedBox(
         width: (width ~/ CalendarParam.weekLength).toDouble(),
         child: Center(
           child: Text(
@@ -217,10 +214,10 @@ class Calendar extends StatelessWidget {
             style: TextStyle(
                 color: index == 5 || index == 6
                     ? themeData.primaryColor
-                    : themeData.textTheme.body1.color),
+                    : themeData.textTheme.bodyText2!.color),
           ),
         ),
-      );
+      ));
     }
     return week;
   }
@@ -244,15 +241,14 @@ class Calendar extends StatelessWidget {
 ///
 class _SnappingScrollPhysics extends ClampingScrollPhysics {
   const _SnappingScrollPhysics({
-    ScrollPhysics parent,
-    @required this.midScrollOffset,
-  })  : assert(midScrollOffset != null),
-        super(parent: parent);
+    ScrollPhysics? parent,
+    required this.midScrollOffset,
+  }) : super(parent: parent);
 
   final double midScrollOffset;
 
   @override
-  _SnappingScrollPhysics applyTo(ScrollPhysics ancestor) {
+  _SnappingScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return _SnappingScrollPhysics(
         parent: buildParent(ancestor), midScrollOffset: midScrollOffset);
   }
@@ -270,10 +266,9 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
   }
 
   @override
-  Simulation createBallisticSimulation(
+  Simulation? createBallisticSimulation(
       ScrollMetrics position, double dragVelocity) {
-    final Simulation simulation =
-        super.createBallisticSimulation(position, dragVelocity);
+    var simulation = super.createBallisticSimulation(position, dragVelocity);
     final double offset = position.pixels;
 
     if (simulation != null) {
@@ -299,9 +294,9 @@ class _SnappingScrollPhysics extends ClampingScrollPhysics {
 ///
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   _SliverAppBarDelegate({
-    @required this.minHeight,
-    @required this.maxHeight,
-    @required this.child,
+    required this.minHeight,
+    required this.maxHeight,
+    required this.child,
   });
 
   // 最小高度
@@ -341,18 +336,17 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 ///
 class _CalendarView extends AnimatedWidget {
   _CalendarView({
-    Key key,
-    @required this.width,
-    @required this.themeData,
-    @required this.startDayOfWeek,
-    @required this.today,
-    @required this.date,
-    @required this.taskTimes,
-    @required this.isWeek,
-    @required this.swiperIndex,
-    @required this.index,
-    @required this.onDateChange,
-  }) : super(key: key, listenable: ValueNotifier<double>(0.0));
+    required this.width,
+    required this.themeData,
+    required this.startDayOfWeek,
+    required this.today,
+    required this.date,
+    required this.taskTimes,
+    required this.isWeek,
+    required this.swiperIndex,
+    required this.index,
+    required this.onDateChange,
+  }) : super(listenable: ValueNotifier<double>(0.0));
 
   // 宽度
   final double width;
@@ -393,7 +387,7 @@ class _CalendarView extends AnimatedWidget {
   ///
   Widget _build(BuildContext context, BoxConstraints constraints) {
     if (isWeek) {
-      List<Widget> widgets = List();
+      List<Widget> widgets = [];
       for (int i = 0; i < CalendarParam.weekLength; i++) {
         DateTime dateTime = date.add(Duration(
             days: i -
@@ -415,7 +409,7 @@ class _CalendarView extends AnimatedWidget {
           DateTime(date.year, date.month + _indexOffset(index), 1);
       int preLength = firstDay.weekday - startDayOfWeek;
       preLength = preLength < 0 ? preLength + 7 : preLength;
-      List<Widget> widgets = List();
+      List<Widget> widgets = [];
       int _lineIndex = 0;
       for (int i = 0;
           i < CalendarParam.weekLength * CalendarParam.monthLines;
@@ -426,7 +420,7 @@ class _CalendarView extends AnimatedWidget {
           _lineIndex = i ~/ CalendarParam.weekLength;
         }
       }
-      List<Widget> children = List();
+      List<Widget> children = [];
       for (int i = 0; i < CalendarParam.monthLines; i++) {
         children.add(LayoutId(
             id: 'week$i',
@@ -479,12 +473,12 @@ class _CalendarView extends AnimatedWidget {
                               : dateTime == today
                                   ? themeData.primaryColor
                                   : dateTime.month == date.month || isWeek
-                                      ? themeData.textTheme.body1.color
-                                      : themeData.textTheme.body1.color
+                                      ? themeData.textTheme.bodyText2!.color
+                                      : themeData.textTheme.bodyText2!.color!
                                           .withOpacity(CalendarParam.opacity),
                           fontWeight: dateTime == today
                               ? FontWeight.bold
-                              : themeData.textTheme.body1.fontWeight,
+                              : themeData.textTheme.bodyText2!.fontWeight,
                         )),
                     SizedBox(
                       height: 5.0,
@@ -526,7 +520,7 @@ class _CalendarView extends AnimatedWidget {
 /// 日历布局
 ///
 class _CalendarLayout extends MultiChildLayoutDelegate {
-  _CalendarLayout({@required this.lineIndex});
+  _CalendarLayout({required this.lineIndex});
 
   // 当前行数
   final int lineIndex;

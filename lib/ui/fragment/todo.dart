@@ -34,10 +34,10 @@ class TodoFragment extends StatefulWidget {
 class _TodoFragmentState extends State<TodoFragment>
     with SingleTickerProviderStateMixin {
   // 动画
-  Animation _animation;
+  late Animation<double> _animation;
 
   // 动画控制器
-  AnimationController _animationController;
+  late AnimationController _animationController;
 
   @override
   void initState() {
@@ -78,11 +78,11 @@ class _TodoFragmentState extends State<TodoFragment>
   /// 任务列表构造
   ///
   List<Widget> _buildTask(MainStateModel model) {
-    List<Widget> list = List(model.todayTasks.length);
+    List<Widget> list = [];
     for (int i = 0; i < model.todayTasks.length; i++) {
       Task task = model.todayTasks[i];
       if (task.type == 0) {
-        list[i] = GestureDetector(
+        list.add(GestureDetector(
           onTap: () {
             ModalUtil.showTaskModal(context, task);
           },
@@ -104,9 +104,11 @@ class _TodoFragmentState extends State<TodoFragment>
                                     ? TextDecoration.lineThrough
                                     : TextDecoration.none,
                                 color: task.status == 2
-                                    ? model.themeData.textTheme.body1.color
+                                    ? model
+                                        .themeData.textTheme.bodyText2!.color!
                                         .withOpacity(CalendarParam.opacity)
-                                    : model.themeData.textTheme.body1.color),
+                                    : model
+                                        .themeData.textTheme.bodyText2!.color),
                           ),
                         ],
                       ),
@@ -135,7 +137,7 @@ class _TodoFragmentState extends State<TodoFragment>
               ),
             ),
           ),
-        );
+        ));
       } else {
         var steps = model.todaySteps
             .where((step) =>
@@ -144,7 +146,7 @@ class _TodoFragmentState extends State<TodoFragment>
                 step.targetTime <= task.endTime)
             .toList();
         int length = steps.length;
-        List<int> data = List(length);
+        List<int> data = List.filled(length, 0);
         for (int i = 0; i < length; i++) {
           data[i] = DateTime.fromMillisecondsSinceEpoch(
                   steps[i].targetTime * 1000)
@@ -155,7 +157,7 @@ class _TodoFragmentState extends State<TodoFragment>
         int stepIndex = model.todaySteps.indexWhere((step) =>
             step.taskId == task.id &&
             step.targetTime == model.today.millisecondsSinceEpoch ~/ 1000);
-        list[i] = GestureDetector(
+        list.add(GestureDetector(
           onTap: () {
             ModalUtil.showTaskModal(context, task);
           },
@@ -199,14 +201,16 @@ class _TodoFragmentState extends State<TodoFragment>
                         ],
                       ),
                       ClockFlag(
-                          clocked: stepIndex > -1,
-                          color: model.themeData.primaryColor,
-                          onPressed: model.clockLocks.indexOf(task.id) > -1
-                              ? null
-                              : () {
-                                  model.changeClockTaskStatus(
-                                      task.id, stepIndex, model.today, 2);
-                                }),
+                        clocked: stepIndex > -1,
+                        color: model.themeData.primaryColor,
+                        onPressed: () {
+                          if (model.clockLocks.indexOf(task.id) > -1) {
+                            return;
+                          }
+                          model.changeClockTaskStatus(
+                              task.id, stepIndex, model.today, 2);
+                        },
+                      ),
                     ],
                   ),
                   ClockProgress(
@@ -227,7 +231,7 @@ class _TodoFragmentState extends State<TodoFragment>
               ),
             ),
           ),
-        );
+        ));
       }
     }
     return list;

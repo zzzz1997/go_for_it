@@ -61,7 +61,7 @@ class ClockFragment extends StatelessWidget {
                               step.targetTime <= task.endTime)
                           .toList();
                       int length = steps.length;
-                      List<int> data = List(length);
+                      List<int> data = List.filled(length, 0);
                       for (int i = 0; i < length; i++) {
                         data[i] = DateTime.fromMillisecondsSinceEpoch(
                                 steps[i].targetTime * 1000)
@@ -123,19 +123,18 @@ class ClockFragment extends StatelessWidget {
                                         ],
                                       ),
                                       ClockFlag(
-                                          clocked: stepIndex > -1,
-                                          color: model.themeData.primaryColor,
-                                          onPressed: model.clockLocks
-                                                      .indexOf(task.id) >
-                                                  -1
-                                              ? null
-                                              : () {
-                                                  model.changeClockTaskStatus(
-                                                      task.id,
-                                                      stepIndex,
-                                                      model.date,
-                                                      0);
-                                                }),
+                                        clocked: stepIndex > -1,
+                                        color: model.themeData.primaryColor,
+                                        onPressed: () {
+                                          if (model.clockLocks
+                                                  .indexOf(task.id) >
+                                              -1) {
+                                            return;
+                                          }
+                                          model.changeClockTaskStatus(task.id,
+                                              stepIndex, model.date, 0);
+                                        },
+                                      ),
                                     ],
                                   ),
                                   ClockProgress(

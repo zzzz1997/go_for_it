@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:go_for_it/ui/view/calendar.dart';
 import 'package:go_for_it/util/alert.dart';
 import 'package:go_for_it/util/constant.dart';
@@ -64,21 +64,21 @@ class DatePicker {
       DatePickerSelectMode selectMode,
       int language,
       int startDayOfWeek,
-      {DateTime firstDate,
-      DateTime lastDate,
-      DatePickerShowMode showMode}) async {
+      {DateTime? firstDate,
+      DateTime? lastDate,
+      DatePickerShowMode? showMode}) async {
     return await showDialog(
       context: context,
       builder: (context) => _DatePickerDialog(
-            startTime: startTime,
-            endTime: endTime,
-            selectMode: selectMode,
-            language: language,
-            startDayOfWeek: startDayOfWeek,
-            firstDate: firstDate,
-            lastDate: lastDate,
-            showMode: showMode,
-          ),
+        startTime: startTime,
+        endTime: endTime,
+        selectMode: selectMode,
+        language: language,
+        startDayOfWeek: startDayOfWeek,
+        firstDate: firstDate,
+        lastDate: lastDate,
+        showMode: showMode,
+      ),
     );
   }
 }
@@ -88,16 +88,14 @@ class DatePicker {
 ///
 class _DatePickerDialog extends StatefulWidget {
   _DatePickerDialog(
-      {Key key,
-      @required this.startTime,
-      @required this.endTime,
-      @required this.selectMode,
-      @required this.language,
-      @required this.startDayOfWeek,
-      @required this.firstDate,
-      @required this.lastDate,
-      @required this.showMode})
-      : super(key: key);
+      {required this.startTime,
+      required this.endTime,
+      required this.selectMode,
+      required this.language,
+      required this.startDayOfWeek,
+      required this.firstDate,
+      required this.lastDate,
+      required this.showMode});
 
   // 开始时间
   final DateTime startTime;
@@ -115,13 +113,13 @@ class _DatePickerDialog extends StatefulWidget {
   final int startDayOfWeek;
 
   // 可选第一天
-  final DateTime firstDate;
+  final DateTime? firstDate;
 
   // 可选最后一天
-  final DateTime lastDate;
+  final DateTime? lastDate;
 
   // 展示模式
-  final DatePickerShowMode showMode;
+  final DatePickerShowMode? showMode;
 
   @override
   State<StatefulWidget> createState() {
@@ -134,34 +132,34 @@ class _DatePickerDialog extends StatefulWidget {
 ///
 class _DatePickerDialogState extends State<_DatePickerDialog> {
   // 开始时间
-  DateTime _startTime;
+  late DateTime _startTime;
 
   // 结束时间
-  DateTime _endTime;
+  late DateTime _endTime;
 
   // 选择模式
-  DatePickerSelectMode _selectMode;
+  late DatePickerSelectMode _selectMode;
 
   // 语言
-  int _language;
+  late int _language;
 
   // 一周开始时间
-  int _startDayOfWeek;
+  late int _startDayOfWeek;
 
   // 可选第一天
-  DateTime _firstDate;
+  late DateTime _firstDate;
 
   // 可选最后一天
-  DateTime _lastDate;
+  late DateTime _lastDate;
 
   // 展示模式
-  DatePickerShowMode _showMode;
+  late DatePickerShowMode _showMode;
 
   // 当前选择年份位置
   int _yearIndex = 0;
 
   // 今天
-  DateTime _today;
+  late DateTime _today;
 
   // 日历位置
   int _index = 0;
@@ -200,13 +198,13 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
     }
 
     // todo Concurrent modification during iteration: Instance(length:3) of '_GrowableList'.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (_showMode == DatePickerShowMode.YEAR) {
         _scrollController
             .jumpTo((_startTime.year - _firstDate.year) * _listHeight);
       }
     });
-    WidgetsBinding.instance.addPersistentFrameCallback((_) {
+    WidgetsBinding.instance!.addPersistentFrameCallback((_) {
       if (_shouldJump) {
         _scrollController.jumpTo(
             ((_yearIndex == 0 ? _startTime.year : _endTime.year) -
@@ -271,7 +269,7 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
                           containedInkWell: false,
                           child: Text(
                             '${_startTime.day},${_startTime.month}',
-                            style: themeData.textTheme.display1.copyWith(
+                            style: themeData.textTheme.headline4!.copyWith(
                                 color: _showMode == DatePickerShowMode.DATE
                                     ? Colors.white
                                     : Colors.white.withOpacity(_opacity)),
@@ -316,11 +314,13 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
                                 containedInkWell: false,
                                 child: Text(
                                   '${_endTime.day},${_endTime.month}',
-                                  style: themeData.textTheme.display1.copyWith(
-                                      color: _showMode ==
-                                              DatePickerShowMode.DATE
-                                          ? Colors.white
-                                          : Colors.white.withOpacity(_opacity)),
+                                  style: themeData.textTheme.headline4!
+                                      .copyWith(
+                                          color: _showMode ==
+                                                  DatePickerShowMode.DATE
+                                              ? Colors.white
+                                              : Colors.white
+                                                  .withOpacity(_opacity)),
                                 ),
                               ),
                             ],
@@ -375,26 +375,24 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
                           ],
                         ),
                 )),
-            ButtonTheme.bar(
-              child: ButtonBar(
-                children: <Widget>[
-                  FlatButton(
-                    child: Text(
-                      Constant.cancel,
-                      style: TextStyle(color: themeData.primaryColor),
-                    ),
-                    onPressed: _onCancelPressed,
+            ButtonBar(
+              children: <Widget>[
+                TextButton(
+                  child: Text(
+                    Constant.cancel,
+                    style: TextStyle(color: themeData.primaryColor),
                   ),
-                  FlatButton(
-                    child: Text(
-                      Constant.confirm,
-                      style: TextStyle(color: themeData.primaryColor),
-                    ),
-                    onPressed: _onConfirmPressed,
+                  onPressed: _onCancelPressed,
+                ),
+                TextButton(
+                  child: Text(
+                    Constant.confirm,
+                    style: TextStyle(color: themeData.primaryColor),
                   ),
-                ],
-              ),
-            )
+                  onPressed: _onConfirmPressed,
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -404,13 +402,14 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
   ///
   /// 年列表构造器
   ///
-  Widget _yearListBuilder(context, index) {
+  Widget _yearListBuilder(context, int index) {
     ThemeData themeData = Theme.of(context);
     int year = _firstDate.year + index;
     bool isSelected =
         _yearIndex == 0 ? _startTime.year == year : _endTime.year == year;
-    bool canSelect = _yearIndex == 0 || year * _monthLength + _endTime.month >
-        _startTime.year * _monthLength + _startTime.month;
+    bool canSelect = _yearIndex == 0 ||
+        year * _monthLength + _endTime.month >
+            _startTime.year * _monthLength + _startTime.month;
     return GestureDetector(
       onTap: canSelect
           ? () {
@@ -423,12 +422,12 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
           child: Text(
             year.toString(),
             style: isSelected
-                ? themeData.textTheme.headline
+                ? themeData.textTheme.headline5!
                     .copyWith(color: themeData.primaryColor)
                 : canSelect
-                    ? themeData.textTheme.body1
-                    : themeData.textTheme.body1.copyWith(
-                        color: themeData.textTheme.body1.color
+                    ? themeData.textTheme.bodyText2
+                    : themeData.textTheme.bodyText2!.copyWith(
+                        color: themeData.textTheme.bodyText2!.color!
                             .withOpacity(_opacity)),
           ),
         ),
@@ -439,14 +438,14 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
   ///
   /// 日历视图构造器
   ///
-  Widget _swiperBuilder(context, index) {
+  Widget _swiperBuilder(context, int index) {
     ThemeData themeData = Theme.of(context);
     double width = _calendarHeight / CalendarParam.weekLength;
-    List<Widget> week = List(CalendarParam.weekLength);
+    List<Widget> week = [];
     for (int i = 0; i < CalendarParam.weekLength; i++) {
       int index = _startDayOfWeek - 1 + i;
       index = index >= 7 ? index - CalendarParam.weekLength : index;
-      week[i] = SizedBox(
+      week.add(SizedBox(
         width: width,
         height: width,
         child: Center(
@@ -457,17 +456,16 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
             style: TextStyle(
                 color: index == 5 || index == 6
                     ? themeData.primaryColor
-                    : themeData.textTheme.body1.color),
+                    : themeData.textTheme.bodyText2!.color),
           ),
         ),
-      );
+      ));
     }
     DateTime firstDay = DateTime(_firstDate.year, _firstDate.month + index);
     int space = firstDay.weekday -
         _startDayOfWeek +
         (_startDayOfWeek > firstDay.weekday ? CalendarParam.weekLength : 0);
-    List<Widget> days =
-        List(CalendarParam.monthLines * CalendarParam.weekLength);
+    List<Widget> days = [];
     for (int i = 0;
         i < CalendarParam.monthLines * CalendarParam.weekLength;
         i++) {
@@ -476,9 +474,10 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
         bool isInRange =
             dateTime.isAfter(_startTime) && dateTime.isBefore(_endTime);
         TextStyle textStyle = dateTime.isAtSameMomentAs(_today)
-            ? themeData.textTheme.body2.copyWith(color: themeData.primaryColor)
-            : themeData.textTheme.body1;
-        days[i] = dateTime.month == firstDay.month
+            ? themeData.textTheme.bodyText1!
+                .copyWith(color: themeData.primaryColor)
+            : themeData.textTheme.bodyText2!;
+        days.add(dateTime.month == firstDay.month
             ? GestureDetector(
                 onTap: () {
                   _onDateTap(dateTime);
@@ -519,12 +518,12 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
             : SizedBox(
                 width: width,
                 height: width,
-              );
+              ));
       } else {
-        days[i] = SizedBox(
+        days.add(SizedBox(
           width: width,
           height: width,
-        );
+        ));
       }
     }
     Wrap calendar = Wrap(

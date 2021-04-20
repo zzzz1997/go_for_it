@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 ///
 class ClockFlag extends StatelessWidget {
   ClockFlag(
-      {@required this.clocked, @required this.color, @required this.onPressed});
+      {required this.clocked, required this.color, required this.onPressed});
 
   // 是否打卡
   final bool clocked;
@@ -14,14 +14,14 @@ class ClockFlag extends StatelessWidget {
   final Color color;
 
   // 点击事件
-  final Function onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       icon: Icon(
         Icons.flag,
-        color: clocked ? color : Colors.grey ,
+        color: clocked ? color : Colors.grey,
       ),
       onPressed: onPressed,
     );

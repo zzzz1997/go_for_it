@@ -15,19 +15,25 @@ class PasswordField extends StatefulWidget {
   });
 
   // 空间键
-  final Key fieldKey;
+  final Key? fieldKey;
+
   // 文本编辑控制器
-  final TextEditingController controller;
+  final TextEditingController? controller;
+
   // 提示文本
-  final String hintText;
+  final String? hintText;
+
   // 标签文本
-  final String labelText;
+  final String? labelText;
+
   // 图标
-  final Icon icon;
+  final Icon? icon;
+
   // 表单设置器
-  final FormFieldSetter<String> onSaved;
+  final FormFieldSetter<String>? onSaved;
+
   // 表单验证器
-  final FormFieldValidator<String> validator;
+  final FormFieldValidator<String>? validator;
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
@@ -60,8 +66,7 @@ class _PasswordFieldState extends State<PasswordField> {
               _obscureText = !_obscureText;
             });
           },
-          child:
-          Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+          child: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
         ),
       ),
     );

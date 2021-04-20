@@ -6,13 +6,13 @@ import 'package:go_for_it/ui/view/calendar.dart';
 ///
 abstract class CalendarModel extends Model {
   // 今天
-  DateTime _today;
+  late DateTime _today;
 
   // 获取今天
   DateTime get today => _today;
 
   // 选择日期
-  DateTime _date;
+  late DateTime _date;
 
   // 获取所选日期
   DateTime get date => _date;
@@ -34,8 +34,6 @@ abstract class CalendarModel extends Model {
 
   // 获取滑动位置
   int get swiperIndex => _swiperIndex;
-
-  factory CalendarModel._() => null;
 
   ///
   /// 初始化时间

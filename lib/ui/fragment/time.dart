@@ -79,11 +79,11 @@ class TimeFragment extends StatelessWidget {
                                                 : TextDecoration.none,
                                             color: task.status == 2
                                                 ? model.themeData.textTheme
-                                                    .body1.color
+                                                    .bodyText2!.color!
                                                     .withOpacity(
                                                         CalendarParam.opacity)
                                                 : model.themeData.textTheme
-                                                    .body1.color),
+                                                    .bodyText2!.color),
                                       ),
                                     ],
                                   ),

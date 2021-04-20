@@ -35,7 +35,7 @@ class _LoginStateState extends State<LoginPage> {
       GlobalKey<FormFieldState>();
 
   // 是否验证
-  bool _autoValidate = false;
+  var _autovalidateMode = AutovalidateMode.disabled;
 
   // 是否登录模式
   bool _isLogin = true;
@@ -60,7 +60,7 @@ class _LoginStateState extends State<LoginPage> {
         padding: EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
-          autovalidate: _autoValidate,
+          autovalidateMode: _autovalidateMode,
           child: Column(
             children: <Widget>[
               Padding(
@@ -78,8 +78,10 @@ class _LoginStateState extends State<LoginPage> {
                     hintText: Constant.pleaseInputUsername,
                     labelText: Constant.username,
                   ),
-                  onSaved: (String value) {
-                    username = value;
+                  onSaved: (String? value) {
+                    if (value != null) {
+                      username = value;
+                    }
                   },
                   validator: _validateUsername,
                 ),
@@ -94,8 +96,10 @@ class _LoginStateState extends State<LoginPage> {
                       : null,
                   hintText: Constant.pleaseInputPassword,
                   labelText: Constant.password,
-                  onSaved: (String value) {
-                    password1 = value;
+                  onSaved: (String? value) {
+                    if (value != null) {
+                      password1 = value;
+                    }
                   },
                   validator: _validatePassword,
                 ),
@@ -112,8 +116,10 @@ class _LoginStateState extends State<LoginPage> {
                             : null,
                         hintText: Constant.pleaseInputPasswordAgain,
                         labelText: Constant.password,
-                        onSaved: (String value) {
-                          password2 = value;
+                        onSaved: (String? value) {
+                          if (value != null) {
+                            password2 = value;
+                          }
                         },
                         validator: _validatePassword,
                       ),
@@ -124,7 +130,7 @@ class _LoginStateState extends State<LoginPage> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      FlatButton(
+                      TextButton(
                         onPressed: _changeModel,
                         child: Text(
                             _isLogin ? Constant.register : Constant.login,
@@ -134,15 +140,19 @@ class _LoginStateState extends State<LoginPage> {
                       SizedBox(
                         width: 20.0,
                       ),
-                      RaisedButton(
+                      ElevatedButton(
                         onPressed: () {
                           _loginOrRegister(model);
                         },
                         child: Text(
                             _isLogin ? Constant.login : Constant.register,
                             style: TextStyle(color: Colors.white)),
-                        color: model.themeData.primaryColor,
-                        shape: const StadiumBorder(),
+                        style: ButtonStyle(
+                          foregroundColor: MaterialStateProperty.all(
+                              model.themeData.primaryColor),
+                          shape:
+                              MaterialStateProperty.all(const StadiumBorder()),
+                        ),
                       ),
                       SizedBox(
                         width: 20.0,
@@ -171,10 +181,10 @@ class _LoginStateState extends State<LoginPage> {
   /// 登录或注册1
   ///
   _loginOrRegister(MainStateModel model) async {
-    final FormState form = _formKey.currentState;
+    final form = _formKey.currentState!;
     form.save();
     if (!form.validate()) {
-      _autoValidate = true;
+      _autovalidateMode = AutovalidateMode.always;
       Alert.errorBar(context, Constant.pleaseCheckInput);
     } else {
       if (model.connectivityResult == ConnectivityResult.none) {
@@ -185,7 +195,7 @@ class _LoginStateState extends State<LoginPage> {
           Transition.pushAndRemoveUntil(
               context, HomePage(), TransitionType.inFromBottom);
         } catch (e) {
-          _autoValidate = true;
+          _autovalidateMode = AutovalidateMode.always;
           Alert.errorBarError(context, e);
         }
       }
@@ -195,18 +205,21 @@ class _LoginStateState extends State<LoginPage> {
   ///
   /// 验证用户名正确性
   ///
-  String _validateUsername(String value) {
-    if (value.isEmpty) {
+  String _validateUsername(String? value) {
+    if (value != null && value.isEmpty) {
       return Constant.pleaseInputUsername;
     } else {
-      return null;
+      return '';
     }
   }
 
   ///
   /// 验证密码正确性
   ///
-  String _validatePassword(String value) {
+  String _validatePassword(String? value) {
+    if (value == null) {
+      return '';
+    }
     if (value.isEmpty) {
       return Constant.pleaseInputPassword;
     } else if (value.length < 6) {
@@ -214,7 +227,7 @@ class _LoginStateState extends State<LoginPage> {
     } else if (!_isLogin && password1 != value) {
       return Constant.passwordNotEqual;
     } else {
-      return null;
+      return '';
     }
   }
 }

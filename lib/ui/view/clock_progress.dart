@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 ///
 class ClockProgress extends StatelessWidget {
   ClockProgress({
-    @required this.width,
-    @required this.height,
-    @required this.frontColor,
+    required this.width,
+    required this.height,
+    required this.frontColor,
     this.backColor = Colors.white,
     this.total = 100,
-    @required this.data,
+    required this.data,
   })  : assert(width >= 0),
         assert(height >= 0),
         assert(total >= 0);
@@ -56,10 +56,10 @@ class ClockProgress extends StatelessWidget {
 ///
 class _ClockProgressPainter extends CustomPainter {
   _ClockProgressPainter({
-    @required this.frontColor,
-    @required this.backColor,
-    @required this.total,
-    @required this.data,
+    required this.frontColor,
+    required this.backColor,
+    required this.total,
+    required this.data,
   });
 
   // 前景色

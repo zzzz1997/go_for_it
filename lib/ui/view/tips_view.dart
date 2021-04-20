@@ -8,12 +8,12 @@ class TipsView extends StatelessWidget {
   final Widget view;
 
   // 提示
-  final String tips;
+  final String? tips;
 
   // 点击方法
-  final Function onTap;
+  final VoidCallback? onTap;
 
-  TipsView({@required this.view, this.tips, this.onTap});
+  TipsView({required this.view, this.tips, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +23,17 @@ class TipsView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             view,
-            tips != null ? SizedBox(height: 10,) : SizedBox(),
-            tips != null ? Text(tips, style: TextStyle(fontSize: 20),) : SizedBox(),
+            tips != null
+                ? SizedBox(
+                    height: 10,
+                  )
+                : SizedBox(),
+            tips != null
+                ? Text(
+                    tips!,
+                    style: TextStyle(fontSize: 20),
+                  )
+                : SizedBox(),
           ],
         ),
         onTap: onTap,

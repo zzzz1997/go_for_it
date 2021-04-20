@@ -38,14 +38,17 @@ class BackupPage extends StatelessWidget {
                 padding: EdgeInsets.all(50.0),
                 child: Text(Constant.backupTips),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text(Constant.backup,
                     style: TextStyle(color: Colors.white)),
                 onPressed: () {
                   _onBackupPressed(context, model);
                 },
-                color: model.themeData.primaryColor,
-                shape: StadiumBorder(),
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all(model.themeData.primaryColor),
+                  shape: MaterialStateProperty.all(StadiumBorder()),
+                ),
               ),
               SizedBox(
                 height: 50.0,
@@ -58,10 +61,8 @@ class BackupPage extends StatelessWidget {
                   child: model.backupStatus == CommonStatus.LOADING
                       ? TipsView(
                           view: SizedBox(
-                            width: ScreenUtil.instance
-                                .setWidth(Constant.width / 4),
-                            height: ScreenUtil.instance
-                                .setWidth(Constant.width / 4),
+                            width: ScreenUtil().setWidth(Constant.width / 4),
+                            height: ScreenUtil().setWidth(Constant.width / 4),
                             child: CircularProgressIndicator(),
                           ),
                           tips: Constant.loading,
@@ -70,11 +71,11 @@ class BackupPage extends StatelessWidget {
                           ? model.backups.length == 0
                               ? TipsView(
                                   view: Icon(Icons.tag_faces,
-                                      size: ScreenUtil.instance
+                                      size: ScreenUtil()
                                           .setWidth(Constant.width / 3)),
                                   tips: Constant.noBackup,
                                   onTap: () {
-                                    _refreshIndicatorKey.currentState.show();
+                                    _refreshIndicatorKey.currentState!.show();
                                   })
                               : ListView.builder(
                                   itemBuilder: (context, index) {
@@ -86,11 +87,11 @@ class BackupPage extends StatelessWidget {
                           : TipsView(
                               view: Icon(Icons.error_outline,
                                   color: Colors.redAccent,
-                                  size: ScreenUtil.instance
+                                  size: ScreenUtil()
                                       .setWidth(Constant.width / 3)),
                               tips: Constant.loadError,
                               onTap: () {
-                                _refreshIndicatorKey.currentState.show();
+                                _refreshIndicatorKey.currentState!.show();
                               },
                             ),
                   onRefresh: () async {
@@ -121,7 +122,7 @@ class BackupPage extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     backup.name,
-                    style: model.themeData.textTheme.title,
+                    style: model.themeData.textTheme.headline6,
                   ),
                   SizedBox(
                     height: 10.0,
@@ -132,23 +133,21 @@ class BackupPage extends StatelessWidget {
                       [yy, '年', m, '月', d, '日', H, '时', n, '分', ss, '秒']))
                 ],
               ),
-              ButtonTheme.bar(
-                child: ButtonBar(
-                  children: <Widget>[
-                    FlatButton(
-                      onPressed: () {
-                        _onRecoveryPressed(context, model, backup);
-                      },
-                      child: Text(Constant.recovery),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        _onDeletePressed(context, model, backup);
-                      },
-                      child: Text(Constant.delete),
-                    )
-                  ],
-                ),
+              ButtonBar(
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      _onRecoveryPressed(context, model, backup);
+                    },
+                    child: Text(Constant.recovery),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      _onDeletePressed(context, model, backup);
+                    },
+                    child: Text(Constant.delete),
+                  )
+                ],
               ),
             ]));
   }

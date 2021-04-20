@@ -16,7 +16,7 @@ import 'package:go_for_it/util/constant.dart';
 ///
 // ignore: must_be_immutable
 class FullscreenDialog extends StatefulWidget {
-  FullscreenDialog({@required this.task});
+  FullscreenDialog({required this.task});
 
   // 任务对象
   final Task task;
@@ -32,13 +32,13 @@ class FullscreenDialog extends StatefulWidget {
 ///
 class _FullscreenDialogState extends State<FullscreenDialog> {
   // 任务对象
-  Task _task;
+  late Task _task;
 
   // 名称控制器
-  TextEditingController _nameController;
+  late TextEditingController _nameController;
 
   // 名称控制器
-  TextEditingController _descriptionController;
+  late TextEditingController _descriptionController;
 
   @override
   void initState() {
@@ -183,9 +183,9 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
   /// 弹窗菜单构造器
   ///
   List<PopupMenuItem> _popupMenuBuilder(context) {
-    List<PopupMenuItem> entries = List(Constant.taskImportance.length);
+    List<PopupMenuItem> entries = [];
     for (int i = 0; i < Constant.taskImportance.length; i++) {
-      entries[i] = PopupMenuItem(
+      entries.add(PopupMenuItem(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
@@ -196,7 +196,7 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
           ],
         ),
         value: i,
-      );
+      ));
     }
     return entries;
   }
@@ -246,7 +246,7 @@ class _FullscreenDialogState extends State<FullscreenDialog> {
             : DatePickerSelectMode.RANGE,
         model.user.language,
         model.user.startDayOfWeek);
-    if (dateTimes != null && dateTimes.length == 2) {
+    if (dateTimes.length == 2) {
       setState(() {
         _task.startTime = dateTimes[0].millisecondsSinceEpoch ~/ 1000;
         _task.endTime = dateTimes[1].millisecondsSinceEpoch ~/ 1000;

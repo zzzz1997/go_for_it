@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,8 +17,6 @@ abstract class UserModel extends Model {
   // 获取用户
   User get user => _user;
 
-  factory UserModel._() => null;
-
   ///
   /// 初始化获取用户
   ///
@@ -35,7 +32,7 @@ abstract class UserModel extends Model {
   ///
   /// 设置选择设置
   ///
-  Future<void> setSelectSetting(setting, value, connectivityResult) {
+  Future<void> setSelectSetting(setting, value, connectivityResult) async {
     switch (setting) {
       case Constant.weekLanguage:
         _user.language = value;
@@ -54,7 +51,6 @@ abstract class UserModel extends Model {
       UserService.set(user);
     }
     notifyListeners();
-    return null;
   }
 
   ///
@@ -76,12 +72,15 @@ abstract class UserModel extends Model {
   ///
   Future<void> changeAvatar() async {
     try {
-      File image = await ImagePicker.pickImage(source: ImageSource.gallery);
-      String avatar = await UserService.avatar(user, image);
-      _user.avatar = avatar;
-      await DatabaseHelper().updateUser(user);
-      Alert.toast(Constant.changeAvatarSuccess);
-      notifyListeners();
+      PickedFile? image =
+          await ImagePicker().getImage(source: ImageSource.gallery);
+      if (image != null) {
+        String avatar = await UserService.avatar(user, image);
+        _user.avatar = avatar;
+        await DatabaseHelper().updateUser(user);
+        Alert.toast(Constant.changeAvatarSuccess);
+        notifyListeners();
+      }
     } catch (e) {
       Alert.toast(Constant.changeAvatarFail);
     }

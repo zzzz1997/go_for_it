@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 /// 半选选择框
 ///
 class HalfCheckBox extends StatelessWidget {
-
-  HalfCheckBox({@required this.status, @required this.color, @required this.onPressed});
+  HalfCheckBox(
+      {required this.status, required this.color, required this.onPressed});
 
   // 状态
   final int status;
@@ -14,7 +14,7 @@ class HalfCheckBox extends StatelessWidget {
   final Color color;
 
   // 点击事件
-  final Function onPressed;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +40,8 @@ class HalfCheckBox extends StatelessWidget {
       case 2:
         iconData = Icons.check_circle_outline;
         break;
+      default:
+        return Icons.check_circle_outline;
     }
     return iconData;
   }

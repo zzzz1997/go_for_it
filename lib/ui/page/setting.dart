@@ -61,9 +61,9 @@ class SettingPage extends StatelessWidget {
         : setting == Constant.weekStart
             ? CalendarParam.weekCh.length
             : Constant.checkModes.length;
-    List<RadioListTile> _radioListTiles = List(length);
+    List<RadioListTile> _radioListTiles = [];
     for (int i = 0; i < length; i++) {
-      _radioListTiles[i] = RadioListTile(
+      _radioListTiles.add(RadioListTile(
         value: i,
         title: Text(setting == Constant.weekLanguage
             ? Constant.languages[i]
@@ -86,7 +86,7 @@ class SettingPage extends StatelessWidget {
           }
           Navigator.pop(context);
         },
-      );
+      ));
     }
     showDialog(
         context: context,

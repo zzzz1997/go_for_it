@@ -5,11 +5,9 @@ import 'package:flutter/material.dart';
 ///
 class ImportanceView extends StatelessWidget {
   ImportanceView(
-      {Key key,
-      @required this.importance,
+      {required this.importance,
       this.padding = const EdgeInsets.all(10.0),
-      this.fontSize = 25})
-      : super(key: key);
+      this.fontSize = 25});
 
   // 重要程度
   final int importance;
@@ -33,11 +31,13 @@ class ImportanceView extends StatelessWidget {
   /// 构建文本
   ///
   List<TextSpan> _buildText() {
-    List<TextSpan> texts = List(3);
+    List<TextSpan> texts = [];
     for (int i = 0; i < 3; i++) {
-      texts[i] = TextSpan(
-          text: '!',
-          style: TextStyle(color: i < importance ? Colors.red : Colors.grey));
+      texts.add(
+        TextSpan(
+            text: '!',
+            style: TextStyle(color: i < importance ? Colors.red : Colors.grey)),
+      );
     }
     return texts;
   }

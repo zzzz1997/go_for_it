@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:go_for_it/model/main.dart';
@@ -24,13 +25,13 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   // 连接状态
-  ConnectivityResult _connectivityResult = ConnectivityResult.none;
+  var _connectivityResult = ConnectivityResult.none;
 
   // 连接对象
-  final Connectivity _connectivity = Connectivity();
+  final _connectivity = Connectivity();
 
   // 连接状态监听
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
@@ -48,16 +49,20 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     MainStateModel model = MainStateModel(context, _connectivityResult);
-    return ScopedModel<MainStateModel>(
-      model: model,
-      child: MaterialApp(
-        title: Constant.appTag,
-        theme: model.themeData,
-        home: HomePage(),
-        routes: <String, WidgetBuilder>{
-          '/home': (BuildContext context) => HomePage(),
-          '/setting': (BuildContext context) => SettingPage(),
-        },
+    return ScreenUtilInit(
+      designSize: Size(Constant.width, Constant.height),
+      allowFontScaling: false,
+      builder: () => ScopedModel<MainStateModel>(
+        model: model,
+        child: MaterialApp(
+          title: Constant.appTag,
+          theme: model.themeData,
+          home: HomePage(),
+          routes: <String, WidgetBuilder>{
+            '/home': (BuildContext context) => HomePage(),
+            '/setting': (BuildContext context) => SettingPage(),
+          },
+        ),
       ),
     );
   }

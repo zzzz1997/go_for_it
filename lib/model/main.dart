@@ -12,13 +12,13 @@ import 'package:go_for_it/model/user.dart';
 class MainStateModel extends Model
     with BackupModel, CalendarModel, TaskModel, UserModel {
   // 定义主题
-  ThemeData _themeData;
+  late ThemeData _themeData;
 
   // 获取主题
   ThemeData get themeData => _themeData;
 
   // 网络连接状态
-  ConnectivityResult _connectivityResult;
+  late ConnectivityResult _connectivityResult;
 
   // 获取网络连接状态
   ConnectivityResult get connectivityResult => _connectivityResult;

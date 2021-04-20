@@ -8,16 +8,17 @@ part of 'user.dart';
 
 User _$UserFromJson(Map<String, dynamic> json) {
   return User(
-      json['id'] as int,
-      json['username'] as String,
-      json['avatar'] as String,
-      json['language'] as int,
-      json['startDayOfWeek'] as int,
-      json['checkMode'] as int,
-      json['token'] as String,
-      json['tokenTime'] as int,
-      false,
-      json['createdTime'] as int);
+    json['id'] as int,
+    json['username'] as String,
+    json['avatar'] as String,
+    json['language'] as int,
+    json['startDayOfWeek'] as int,
+    json['checkMode'] as int,
+    json['token'] as String,
+    json['tokenTime'] as int,
+    json['isLogin'] as bool,
+    json['createdTime'] as int,
+  );
 }
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -29,5 +30,6 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'checkMode': instance.checkMode,
       'token': instance.token,
       'tokenTime': instance.tokenTime,
-      'createdTime': instance.createdTime
+      'isLogin': instance.isLogin,
+      'createdTime': instance.createdTime,
     };

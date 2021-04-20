@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_for_it/entity/task.dart';
 import 'package:go_for_it/model/main.dart';
@@ -27,22 +26,18 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 初始化ScreenUtil
-    ScreenUtil.instance =
-        ScreenUtil(width: Constant.width, height: Constant.height)
-          ..init(context);
     return ScopedModelDescendant<MainStateModel>(
         builder: (context, widget, model) {
       // 底部导航列表
-      List<BottomNavigationBarItem> _items = List();
+      List<BottomNavigationBarItem> _items = [];
       for (int i = 0; i < Constant.tabTexts.length; i++) {
         _items.add(BottomNavigationBarItem(
           icon: _getIcon(model, i),
-          title: Text(Constant.tabTexts[i]),
+          label: Constant.tabTexts[i],
         ));
       }
       return Scaffold(
-        resizeToAvoidBottomPadding: false,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text('${model.date.month}/${model.date.day}'),
           actions: <Widget>[
@@ -86,9 +81,7 @@ class HomePage extends StatelessWidget {
                 child: UserAccountsDrawerHeader(
                   currentAccountPicture: model.user.isLogin
                       ? CircleAvatar(
-                          backgroundImage: model.user.isLogin
-                              ? CachedNetworkImageProvider(model.user.avatar)
-                              : SvgPicture.asset(Constant.defaultAvatarSVG),
+                          backgroundImage: CachedNetworkImageProvider(model.user.avatar),
                         )
                       : SvgPicture.asset(Constant.defaultAvatarSVG),
                   accountName: Text(model.user.isLogin
@@ -157,13 +150,10 @@ class HomePage extends StatelessWidget {
     switch (index) {
       case 0:
         return ClockFragment();
-        break;
       case 1:
         return TimeFragment();
-        break;
       case 2:
         return TodoFragment();
-        break;
       default:
         return Text(Constant.unknownArea);
     }

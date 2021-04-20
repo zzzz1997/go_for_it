@@ -8,16 +8,17 @@ part of 'task.dart';
 
 Task _$TaskFromJson(Map<String, dynamic> json) {
   return Task(
-      json['id'] as int,
-      json['type'] as int,
-      json['classification'] as int,
-      json['name'] as String,
-      json['description'] as String,
-      json['importance'] as int,
-      json['status'] as int,
-      json['startTime'] as int,
-      json['endTime'] as int,
-      json['createdTime'] as int);
+    json['id'] as int,
+    json['type'] as int,
+    json['classification'] as int,
+    json['name'] as String,
+    json['description'] as String,
+    json['importance'] as int,
+    json['status'] as int,
+    json['startTime'] as int,
+    json['endTime'] as int,
+    json['createdTime'] as int,
+  );
 }
 
 Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
@@ -30,5 +31,5 @@ Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
       'status': instance.status,
       'startTime': instance.startTime,
       'endTime': instance.endTime,
-      'createdTime': instance.createdTime
+      'createdTime': instance.createdTime,
     };

@@ -20,18 +20,16 @@ abstract class BackupModel extends Model {
   bool get isBackupFirst => _isBackupFirst;
 
   // 状态
-  CommonStatus _backupStatus;
+  var _backupStatus = CommonStatus.LOADING;
 
   // 获取状态
   CommonStatus get backupStatus => _backupStatus;
 
   // 备份列表
-  List<Backup> _backups;
+  List<Backup> _backups = [];
 
   // 获取备份列表
   List<Backup> get backups => _backups;
-
-  factory BackupModel._() => null;
 
   ///
   /// 刷新备份信息
@@ -39,7 +37,7 @@ abstract class BackupModel extends Model {
   Future<void> refreshBackup(user, connectivityResult) async {
     _backupStatus = CommonStatus.LOADING;
     _isBackupFirst = false;
-    _backups = null;
+    _backups = [];
     notifyListeners();
     if (connectivityResult != ConnectivityResult.none) {
       try {
